@@ -1,51 +1,51 @@
+from flask import Flask, redirect, request, session, url_for, render_template
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-import requests
 
+app = Flask(__name__)
+
+# Set a secret key for session management
+app.secret_key = 'some_secret_key'
+
+# Set the Spotify API credentials
 client_id = '6f8bacd4931e41839442e43813d4fcfb'
 client_secret = 'bd500cdc7b674c3087c2eadbdb0ec058'
+redirect_uri = 'http://localhost:3000/callback'
 
+# Initialize Spotify API client
+sp_oauth = SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri, scope='user-top-read')
+sp = spotipy.Spotify(auth_manager=sp_oauth)
 
-sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri='http://localhost:8888/', scope='user-top-read'))
+@app.route('/')
+def index():
+    if not session.get('token_info'):
+        return redirect(url_for('login'))
+    token_info = session.get('token_info')
+    sp = spotipy.Spotify(auth=token_info['access_token'])
+    
+    time_range = 'short_term'
+    limit = 10
+    top_artists = sp.current_user_top_artists(time_range='short_term', limit=50)
 
-time_range = 'short_term'
+    genre_count = {}
+    for artist in top_artists['items']:
+        for genre in artist['genres']:
+            genre_count[genre] = genre_count.get(genre, 0) + 1
 
-limit = 10
+    most_listened_genre = max(genre_count.keys(), key=lambda genre: genre_count[genre])
+    
+    return f"The most listened genre over the past 30 days is: {most_listened_genre}"
 
-top_tracks = sp.current_user_top_tracks(time_range=time_range, limit=limit)
-top_artists = sp.current_user_top_artists(time_range='short_term', limit=50)
-#--------------------------------------------------------------------------
-#                              Top genre 
-genre_count = {}
-for artist in top_artists['items']:
-    for genre in artist['genres']:
-        genre_count[genre] = genre_count.get(genre, 0) + 1
+@app.route('/login')
+def login():
+    auth_url = sp_oauth.get_authorize_url()
+    return render_template('login.html', auth_url=auth_url)
 
-most_listened_genre = max(genre_count.keys(), key=lambda genre: genre_count[genre])
+@app.route('/callback')
+def callback():
+    token_info = sp_oauth.get_access_token(request.args['code'])
+    session['token_info'] = token_info
+    return redirect(url_for('index'))
 
-print(f"The most listened genre over the past 30 days is: {most_listened_genre}")
-
-
-#--------------------------------------------------------------------------
-#                        Dictionary wth scores using Spotify metrics
-audio_features = {
-    'danceability': 0,
-    'energy': 0,
-    'key': 0,
-    'loudness': 0,
-    'mode': 0,
-    'speechiness': 0,
-    'acousticness': 0,
-    'instrumentalness': 0,
-    'liveness': 0,
-    'valence': 0,
-    'tempo': 0,}
-
-for song in top_tracks['items']:
-    track_id = song['id']
-    features = sp.audio_features(track_id)[0]
-    for metric in features:
-        if metric in audio_features:
-            audio_features[metric] = audio_features[metric] + features[metric]
-            
-print(audio_features)
+if __name__ == '__main__':
+    app.run(debug=True, port=8888)
