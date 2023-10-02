@@ -41,11 +41,16 @@ def index():
     
     return f"The most listened genre over the past 30 days is: {most_listened_genre}"
 
+@app.route('/loginpage')
+def loginpage():
+    auth_url = sp_oauth.get_authorize_url()
+    return render_template('loginpage.html', auth_url=auth_url)
+
 @app.route('/displayhistory')
 def display_history():
     if not session.get('token_info'):
         # If the user is not logged in, redirect to the login page
-        return redirect(url_for('login'))
+        return redirect(url_for('loginpage')) 
     # Render the displayhistory.html template
     return render_template('displayhistory.html')
 
