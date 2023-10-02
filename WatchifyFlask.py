@@ -1,10 +1,15 @@
 from flask import Flask, redirect, request, session, url_for, render_template
+from os import environ  # Ensure this import is here
+from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 
+# Load environment variables from .env file
+load_dotenv()
+
 app = Flask(__name__)
 
-# Set a secret key for session management
+# Set secret key from environment variable
 app.secret_key = environ.get('SECRET_KEY')
 
 # Set the Spotify API credentials
