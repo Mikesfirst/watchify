@@ -24,7 +24,7 @@ sp = spotipy.Spotify(auth_manager=sp_oauth)
 @app.route('/')
 def index():
     if not session.get('token_info'):
-        return redirect(url_for('login'))
+        return redirect(url_for('loginpage'))
     token_info = session.get('token_info')
     sp = spotipy.Spotify(auth=token_info['access_token'])
     
@@ -41,10 +41,10 @@ def index():
     
     return f"The most listened genre over the past 30 days is: {most_listened_genre}"
 
-@app.route('/login')
+@app.route('/loginpage')
 def login():
     auth_url = sp_oauth.get_authorize_url()
-    return render_template('login.html', auth_url=auth_url)
+    return render_template('loginpage.html', auth_url=auth_url)
 
 @app.route('/callback')
 def callback():
