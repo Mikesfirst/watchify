@@ -5,7 +5,7 @@ from spotipy.oauth2 import SpotifyOAuth
 app = Flask(__name__)
 
 # Set a secret key for session management
-app.secret_key = 'some_secret_key'
+app.secret_key = environ.get('mvrcs4%5%6')
 
 # Set the Spotify API credentials
 client_id = '6f8bacd4931e41839442e43813d4fcfb'
