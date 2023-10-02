@@ -13,9 +13,9 @@ app = Flask(__name__)
 app.secret_key = environ.get('SECRET_KEY')
 
 # Set the Spotify API credentials
-client_id = '6f8bacd4931e41839442e43813d4fcfb'
-client_secret = 'bd500cdc7b674c3087c2eadbdb0ec058'
-redirect_uri = 'http://localhost:3000/callback'
+client_id = environ.get('CLIENT_ID')
+client_secret = environ.get('CLIENT_SECRET')
+redirect_uri = environ.get('REDIRECT_URI')
 
 # Initialize Spotify API client
 sp_oauth = SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri, scope='user-top-read')
