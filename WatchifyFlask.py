@@ -48,7 +48,7 @@ def login():
 
 @app.route('/callback')
 def callback():
-    token_info = sp_oauth.get_access_token(request.args['code'])
+    token_info = sp_oauth.get_access_token(request.args['code'], as_dict=False)  # Update here
     session['token_info'] = token_info
     return redirect(url_for('index'))
 
