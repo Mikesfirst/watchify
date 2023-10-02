@@ -1,5 +1,5 @@
 from flask import Flask, redirect, request, session, url_for, render_template
-from os import environ  # Ensure this import is here
+from os import environ  
 from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
@@ -41,16 +41,21 @@ def index():
     
     return f"The most listened genre over the past 30 days is: {most_listened_genre}"
 
-@app.route('/loginpage')
-def login():
-    auth_url = sp_oauth.get_authorize_url()
-    return render_template('loginpage.html', auth_url=auth_url)
+@app.route('/displayhistory')
+def display_history():
+    if not session.get('token_info'):
+        # If the user is not logged in, redirect to the login page
+        return redirect(url_for('login'))
+    # Render the displayhistory.html template
+    return render_template('displayhistory.html')
 
 @app.route('/callback')
 def callback():
-    token_info = sp_oauth.get_access_token(request.args['code'], as_dict=False)  # Update here
+    token_info = sp_oauth.get_access_token(request.args['code'], as_dict=False)
     session['token_info'] = token_info
-    return redirect(url_for('index'))
+    # Redirect to the displayhistory route after obtaining the token information
+    return redirect(url_for('display_history'))
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=3000)
