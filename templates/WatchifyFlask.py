@@ -16,6 +16,7 @@ app.secret_key = environ.get('SECRET_KEY')
 client_id = environ.get('CLIENT_ID')
 client_secret = environ.get('CLIENT_SECRET')
 redirect_uri = 'http://localhost:3000/callback' 
+redirect_uri = 'http://localhost:3000/displayhistory'
 
 # Initialize Spotify API client
 sp_oauth = SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri, scope='user-top-read')
