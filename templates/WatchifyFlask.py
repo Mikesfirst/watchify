@@ -45,7 +45,7 @@ def index():
 def loginpage():
     auth_url = sp_oauth.get_authorize_url()
     if request.method == 'POST':
-        return redirect('displayrecommendation.html')
+        return redirect(url_for('callback'))
     return render_template('loginpage.html', auth_url=auth_url)
 
 @app.route('/displayhistory')

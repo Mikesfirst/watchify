@@ -5,6 +5,8 @@ import requests
 client_id = '6f8bacd4931e41839442e43813d4fcfb'
 client_secret = 'bd500cdc7b674c3087c2eadbdb0ec058'
 
+auth_url = url: 'https://accounts.spotify.com/api/token',
+
 
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri='http://localhost:8888/', scope='user-top-read'))
 
