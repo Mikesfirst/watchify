@@ -45,7 +45,9 @@ def index():
 def loginpage():
     auth_url = sp_oauth.get_authorize_url(client_id, client_secret, 'https://shamp00the-cat.github.io/movierecs/displayhistory', scope='user-top-read')
     sp = spotipy.Spotify(auth_manager=sp_oauth)
+    print("Auth URL:", auth_url)  # Add this line for debugging
     return render_template('loginpage.html', auth_url=auth_url)
+
 
 @app.route('/displayhistory')
 def display_history():
