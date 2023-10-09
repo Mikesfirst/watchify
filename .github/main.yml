@@ -1,9 +1,5 @@
 name: "Terraform action"
-on:
-  push:
-    branches:
-      - main
-  pull_request:
+on: push
 permissions:
   id-token: write # This is required for aws oidc connection
   contents: read # This is required for actions/checkout
