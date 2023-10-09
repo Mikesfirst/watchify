@@ -16,7 +16,6 @@ app.secret_key = environ.get('SECRET_KEY')
 client_id = environ.get('CLIENT_ID')
 client_secret = environ.get('CLIENT_SECRET')
 redirect_uri = 'https://shamp00the-cat.github.io/movierecs/callback' 
-redirect_uri = 'https://shamp00the-cat.github.io/movierecs/displayhistory'
 
 # Initialize Spotify API client
 sp_oauth = SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri, scope='user-top-read')
@@ -43,10 +42,12 @@ def index():
 
 @app.route('/loginpage')
 def loginpage():
-    auth_url = sp_oauth.get_authorize_url(client_id, client_secret, 'https://shamp00the-cat.github.io/movierecs/displayhistory', scope='user-top-read')
+    auth_url = sp_oauth.get_authorize_url()
     sp = spotipy.Spotify(auth_manager=sp_oauth)
-    print("Auth URL:", auth_url)  # Add this line for debugging
+    if 'token_info' in session:
+        return redirect(url_for('display_history'))
     return render_template('loginpage.html', auth_url=auth_url)
+
 
 
 @app.route('/displayhistory')
@@ -57,10 +58,11 @@ def display_history():
 
 @app.route('/callback')
 def callback():
+    print("call backk!!!!")
     token_info = sp_oauth.get_access_token(request.args['code'], as_dict=False)
     session['token_info'] = token_info
     # Redirect to the display_history route after obtaining the token information
-    return redirect(url_for('display_history'))
+    return render_template('displayhistory.html')
 
 
 if __name__ == '__main__':
