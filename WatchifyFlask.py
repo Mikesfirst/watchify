@@ -26,6 +26,7 @@ def index():
     if not session.get('token_info'):
         return redirect(url_for('loginpage'))
     token_info = session.get('token_info')
+    print("Token Info:", token_info)
     sp = spotipy.Spotify(auth=token_info['access_token'])
 
     time_range = 'short_term'
@@ -37,8 +38,9 @@ def index():
             genre_count[genre] = genre_count.get(genre, 0) + 1
 
     most_listened_genre = max(genre_count.keys(), key=lambda genre: genre_count[genre])
-
-    return f"The most listened genre over the past 30 days is: {most_listened_genre}"
+    
+    print("The most listened genre over the past 30 days is: {most_listened_genre}")
+    return render_template('index.html')
 
 @app.route('/loginpage')
 def loginpage():
