@@ -6,7 +6,6 @@ from spotipy.oauth2 import SpotifyOAuth
 from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
 import random
-from datetime import date
 
 # Load environment variables from .env file
 load_dotenv('.env')
