@@ -15,7 +15,10 @@ app.secret_key = environ.get('SECRET_KEY')
 # Set the Spotify API credentials
 client_id = environ.get('CLIENT_ID')
 client_secret = environ.get('CLIENT_SECRET')
-redirect_uri = 'https://shamp00the-cat.github.io/movierecs/callback' 
+# redirect_uri = 'https://shamp00the-cat.github.io/movierecs/callback' 
+redirect_uri = 'http://127.0.0.1:5000/callback' 
+
+
 
 # Initialize Spotify API client
 sp_oauth = SpotifyOAuth(client_id=client_id, client_secret=client_secret, redirect_uri=redirect_uri, scope='user-top-read')
@@ -27,7 +30,7 @@ def index():
         return redirect(url_for('loginpage'))
     token_info = session.get('token_info')
     print("Token Info:", token_info)
-    sp = spotipy.Spotify(auth=token_info['access_token'])
+    sp = spotipy.Spotify(auth=token_info)
 
     time_range = 'short_term'
     top_artists = sp.current_user_top_artists(time_range='short_term', limit=50)
@@ -44,6 +47,7 @@ def index():
 
 @app.route('/loginpage')
 def loginpage():
+    print("log in!!!!")
     auth_url = sp_oauth.get_authorize_url()
     sp = spotipy.Spotify(auth_manager=sp_oauth)
     if 'token_info' in session:
