@@ -11,11 +11,10 @@ app = Flask(__name__)
 
 # Set secret key from environment variable
 app.secret_key = environ.get('SECRET_KEY')
-
 # Set the Spotify API credentials
 client_id = environ.get('CLIENT_ID')
 client_secret = environ.get('CLIENT_SECRET')
-redirect_uri = 'https://shamp00the-cat.github.io/movierecs/callback' 
+redirect_uri = "http://127.0.0.1:5000/callback"
 
 
 
@@ -46,7 +45,7 @@ def index():
 
 @app.route('/loginpage')
 def loginpage():
-    print("log in!!!!")
+    print("loginpage", "redirect_uri: ", redirect_uri)
     auth_url = sp_oauth.get_authorize_url()
     sp = spotipy.Spotify(auth_manager=sp_oauth)
     if 'token_info' in session:
