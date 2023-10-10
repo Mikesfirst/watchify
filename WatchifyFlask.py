@@ -15,7 +15,7 @@ app.secret_key = environ.get('SECRET_KEY')
 # Set the Spotify API credentials
 client_id = environ.get('CLIENT_ID')
 client_secret = environ.get('CLIENT_SECRET')
-# redirect_uri = 'https://shamp00the-cat.github.io/movierecs/callback' 
+redirect_uri = 'https://shamp00the-cat.github.io/movierecs/callback' 
 redirect_uri = 'http://127.0.0.1:5000/callback' 
 
 
