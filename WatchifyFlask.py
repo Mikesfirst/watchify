@@ -1,22 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, session
-from os import environ
-from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
 import random
 
-# Load environment variables from .env file
-load_dotenv('.env')
-
 app = Flask(__name__)
 app.secret_key = 'SECRET_KEY'
-
-# Spotify API Credentials
-SPOTIPY_CLIENT_ID = 'ecec60c9a316409a84a45c923f7473ee'
-SPOTIPY_CLIENT_SECRET = '3129b9225476463d86ddc4074cfc8500'
-SPOTIPY_REDIRECT_URI = 'https://shamp00the-cat.github.io/movierecs/callback'
 
 sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
                         client_secret=SPOTIPY_CLIENT_SECRET,
