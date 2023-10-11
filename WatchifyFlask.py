@@ -25,7 +25,6 @@ sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
 # DB Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@YOUR_RDS_ENDPOINT:5432/watchify' # change
 db = SQLAlchemy(app)
-
 class Recommendation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     spotify_genres = db.Column(db.String)
@@ -152,6 +151,7 @@ def index():
 
 @app.route('/login')
 def login():
+>>>>>>> refs/remotes/origin/main
     auth_url = sp_oauth.get_authorize_url()
     return redirect(auth_url)
 
