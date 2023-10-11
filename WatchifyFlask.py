@@ -143,9 +143,10 @@ def index():
 
 @app.route('/login')
 def login():
+    return render_template('loginpage.html')
     auth_url = sp_oauth.get_authorize_url()
     return redirect(auth_url)
-    return render_template('loginpage.html')
+
 
 @app.route('/callback')
 def callback():
