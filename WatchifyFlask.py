@@ -156,10 +156,10 @@ def callback():
 
 @app.route('/history')
 def display_history():
-    # Fetch user's top tracks from the past 30 days (short term)
-top_tracks = sp.current_user_top_tracks(limit=50, time_range='short_term')
+# Fetch user's top tracks from the past 30 days (short term)
+    top_tracks = sp.current_user_top_tracks(limit=50, time_range='short_term')
 # Extract artists from the top tracks
-artist_ids = [track['album']['artists'][0]['id'] for track in top_tracks['items']]
+    artist_ids = [track['album']['artists'][0]['id'] for track in top_tracks['items']]
 # Fetch artist details for these artists
 artists = sp.artists(artist_ids)['artists']
 # Count frequency of each genre
@@ -172,14 +172,14 @@ for artist in artists:
             genre_count[genre] = 1
 # Sort genres by frequency, get top 5, and capitalize the first letter of each genre
 top_5_genres = [genre.capitalize() for genre in sorted(genre_count, key=genre_count.get, reverse=True)[:5]]
-print("Your top 5 most listened to genres over the past 30 days are: ("top_5_genres")")
+print("Your top 5 most listened to genres over the past 30 days are: ('top_5_genres')")
 return render_template('displayhistory.html', history=recommendations_db.to_dict(orient='records'))
 
 @app.route('/recommendation', methods=['POST'])
 def recommendation():
     token = session.get('token')
     if not token:
-        return redirect(url_for('login'))
+        return redirect(url_for('loginpage'))
 
     sp = spotipy.Spotify(auth=token)
     
