@@ -17,7 +17,6 @@ app.secret_key = 'SECRET_KEY'
 SPOTIPY_CLIENT_ID = 'ecec60c9a316409a84a45c923f7473ee'
 SPOTIPY_CLIENT_SECRET = '3129b9225476463d86ddc4074cfc8500'
 SPOTIPY_REDIRECT_URI = 'https://shamp00the-cat.github.io/movierecs/callback'
-SPOTIPY_REDIRECT_URI = 'https://shamp00the-cat.github.io/movierecs/displayhistory'
 
 sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
                         client_secret=SPOTIPY_CLIENT_SECRET,
@@ -161,7 +160,7 @@ def callback():
     code = request.args['code']
     token = sp_oauth.get_access_token(code, as_dict=False)
     session['token'] = token
-    return render_template('loginpage.html')
+    return render_template('displayhistory.html')
 
 @app.route('/history')
 def display_history():
