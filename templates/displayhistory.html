@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Watchify: Your Musical Journey</title>
+</head>
+<body>
+    <header>
+        <h1>Your Musical Journey</h1>
+        <h2>Visualize Your 30-Day Spotify Listening History</h2>
+    </header>
+    <main>
+        <h1>Your Top 5 Genres for the Past 30 Days are:</h1>
+    <ul>
+        {% for genre in history %}
+            <li>{{ genre }}</li>
+        {% endfor %}
+    </ul>
+    <p>Immerse yourself in the visual representation of your Spotify listening history over the last month...</p>
+        <footer>
+            <a href="/displayrecommendation.html">Proceed to Recommendations</a>
+        </footer>
+    </main>
+</body>
+</html>
