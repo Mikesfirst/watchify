@@ -1,24 +1,8 @@
-<!-- Page 4: Display Movie/TV Show Recommendation -->
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Watchify: Your Personalized Recommendations</title>
-  </head>
-  <body>
-    <header>
-      <h1>Your Personalized Recommendations</h1>
-      <h2>Movies/TV Shows Aligned with Your Musical Tastes</h2>
-    </header>
-    <main>
-      <p>
-        Unveil movies and TV shows meticulously aligned with your music
-        listening history...
-      </p>
-      <button>Download Graphic/Animation</button>
-      <footer>
-        <a href="displayhistory.html">Back to Listening History</a>
-        <a href="../index.html">Back to Home</a>
-      </footer>
-    </main>
-  </body>
-</html>
+<h1>Would you like a movie or TV show recommendation?</h1>
+    <form action="/recommendation" method="post">
+        <input type="radio" name="choice" value="movie" id="movie" required>
+        <label for="movie">Movie</label>
+        <input type="radio" name="choice" value="tvshow" id="tvshow" required>
+        <label for="tvshow">TV Show</label>
+        <input type="submit" value="Get Recommendation">
+    </form>

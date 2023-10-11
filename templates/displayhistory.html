@@ -1,4 +1,3 @@
-<!-- Page 3: Display User’s Listening History -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,11 +9,15 @@
         <h2>Visualize Your 30-Day Spotify Listening History</h2>
     </header>
     <main>
-        <p>Immerse yourself in the visual representation of your Spotify listening history over the last month...</p>
-        <button>Choose Movie Recommendations</button>
-        <button>Choose TV Show Recommendations</button>
+        <h1>Your Top 5 Genres for the Past 30 Days are:</h1>
+    <ul>
+        {% for genre in history %}
+            <li>{{ genre }}</li>
+        {% endfor %}
+    </ul>
+    <p>Immerse yourself in the visual representation of your Spotify listening history over the last month...</p>
         <footer>
-            <a href="displayrecommendation.html">Proceed to Recommendations</a>
+            <a href="/displayrecommendation">Proceed to Recommendations</a>
         </footer>
     </main>
 </body>
