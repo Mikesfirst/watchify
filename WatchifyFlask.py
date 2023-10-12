@@ -13,7 +13,6 @@ import random
 app = Flask(__name__)
 app.secret_key = 'SECRET_KEY'
 
-sp = ''
 top_5_genres = ''
 genre_count = {}
 recommended_tvshow = []
@@ -156,7 +155,7 @@ tvshow_genre_mapping = {
 }
 
 
-@app.route('/index')
+@app.route('/')
 def index():
     return render_template('index.html')
 
@@ -167,22 +166,19 @@ def login():
 
 @app.route('/callback')
 def callback():
-    print("Callback went through!")
     code = request.args['code']
     token = sp_oauth.get_access_token(code, as_dict=False)
     session['token'] = token
+    global sp
     sp = spotipy.Spotify(auth=token)
-    return render_template('displayhistory.html')
+    return redirect(url_for('display_history'))
 
 @app.route('/history')
 def display_history():
     # Fetch user's top tracks from the past 30 days (short term)
     top_tracks = sp.current_user_top_tracks(limit=50, time_range='short_term')
-    # Extract artists from the top tracks
     artist_ids = [track['album']['artists'][0]['id'] for track in top_tracks['items']]
-    # Fetch artist details for these artists
     artists = sp.artists(artist_ids)['artists']
-    # Count frequency of each genre
     for artist in artists:
         for genre in artist['genres']:
             if genre in genre_count:
@@ -192,8 +188,7 @@ def display_history():
 
     # Ensure that the genres from Spotify are in lowercase for the mapping.
     top_5_genres = [genre.lower() for genre in sorted(genre_count, key=genre_count.get, reverse=True)[:5]]
-    print("Your top 5 most listened to genres over the past 30 days are: top_5_genres")
-    return render_template('displayhistory.html')
+    return render_template('displayhistory.html', top_5_genres=top_5_genres)
 
 @app.route('/recommendation', methods=['POST'])
 def recommendation():
