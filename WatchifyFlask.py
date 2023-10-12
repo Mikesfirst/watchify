@@ -1,19 +1,38 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+from os import environ
+#from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
 import random
 
+# Load environment variables from .env file
+#load_dotenv('.env')
+
 app = Flask(__name__)
 app.secret_key = 'SECRET_KEY'
+
+sp = ''
+top_5_genres = ''
+genre_count = {}
+recommended_tvshow = []
+recommended_movie = []
+
+# Spotify API Credentials
+SPOTIPY_CLIENT_ID = 'ecec60c9a316409a84a45c923f7473ee'
+SPOTIPY_CLIENT_SECRET = '3129b9225476463d86ddc4074cfc8500'
+SPOTIPY_REDIRECT_URI = 'https://shamp00the-cat.github.io/movierecs/callback'
+
+#Michael's ID just to run locally
+# SPOTIPY_CLIENT_ID = "6f8bacd4931e41839442e43813d4fcfb"
+# SPOTIPY_CLIENT_SECRET = "bd500cdc7b674c3087c2eadbdb0ec058" 
+# SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
 
 sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
                         client_secret=SPOTIPY_CLIENT_SECRET,
                         redirect_uri=SPOTIPY_REDIRECT_URI,
                         scope=["user-top-read"])
-
-
 # DB Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@YOUR_RDS_ENDPOINT:5432/watchify' # change
 db = SQLAlchemy(app)
@@ -144,37 +163,37 @@ def index():
 @app.route('/login')
 def login():
     auth_url = sp_oauth.get_authorize_url()
-    return redirect(auth_url)
-    return render_template('loginpage.html')
-    
+    return render_template('loginpage.html', auth_url=auth_url)
 
 @app.route('/callback')
 def callback():
+    print("Callback went through!")
     code = request.args['code']
     token = sp_oauth.get_access_token(code, as_dict=False)
     session['token'] = token
-    return render_template('displayhistorpage.html')
+    sp = spotipy.Spotify(auth=token)
+    return render_template('displayhistory.html')
 
 @app.route('/history')
 def display_history():
-# Fetch user's top tracks from the past 30 days (short term)
+    # Fetch user's top tracks from the past 30 days (short term)
     top_tracks = sp.current_user_top_tracks(limit=50, time_range='short_term')
-# Extract artists from the top tracks
+    # Extract artists from the top tracks
     artist_ids = [track['album']['artists'][0]['id'] for track in top_tracks['items']]
-# Fetch artist details for these artists
+    # Fetch artist details for these artists
     artists = sp.artists(artist_ids)['artists']
-# Count frequency of each genre
-    genre_count = {}
+    # Count frequency of each genre
     for artist in artists:
         for genre in artist['genres']:
             if genre in genre_count:
-                genre_count[genre] += 1
+              genre_count[genre] += 1
             else:
-                genre_count[genre] = 1
-# Sort genres by frequency, get top 5, and capitalize the first letter of each genre
-    top_5_genres = [genre.capitalize() for genre in sorted(genre_count, key=genre_count.get, reverse=True)[:5]]
-    print("Your top 5 most listened to genres over the past 30 days are: ('top_5_genres')")
-    return render_template('displayhistory.html', history=recommendations_db.to_dict(orient='records'))
+              genre_count[genre] = 1
+
+    # Ensure that the genres from Spotify are in lowercase for the mapping.
+    top_5_genres = [genre.lower() for genre in sorted(genre_count, key=genre_count.get, reverse=True)[:5]]
+    print("Your top 5 most listened to genres over the past 30 days are: top_5_genres")
+    return render_template('displayhistory.html')
 
 @app.route('/recommendation', methods=['POST'])
 def recommendation():
@@ -219,8 +238,8 @@ def recommendation():
             else:
               print("No movies found for the genre:", recommended_genre)
               return
-        print(f"Recommended Movie: {recommended_movie['movie_name']} (Genre: {recommended_movie['genre'].capitalize()}, Rating: {recommended_movie['rating']}, Release Year: {recommended_movie['year']})")
-        save_recommendation(top_5_genres, 'Movie', recommended_movie['movie_name'], recommended_movie['genre'].capitalize(), recommended_movie['rating']) 
+        print(f"Recommended Movie: {recommended_movie} (Genre: {recommended_movie}, Rating: {recommended_movie}")
+        # leaving this here for now just cleaning up the code//save_recommendation(top_5_genres, 'Movie', recommended_movie['movie_name'], recommended_movie['genre'].capitalize(), recommended_movie['rating']) 
 
     # TV Show Filtering
     elif choice == "tvshow":
@@ -249,10 +268,10 @@ def recommendation():
         print(f"Recommended TV Show: {recommended_show['title']} (Genre: {recommended_genre}, Rating: {recommended_show['rating']}, Release Year: {earliest_year.strip('()')})")
     return render_template('displayrecommendation.html', recommended_movie=recommended_movie, recommended_show=recommended_show)
 
-new_recommendation = Recommendation(','.join(top_5_genres), 'Movie', recommended_movie['movie_name'], recommended_movie['genre'].capitalize(), recommended_movie['rating'])
-new_recommendation = Recommendation(','.join(top_5_genres), 'TV Show', recommended_tvshow['title'], recommended_tvshow['genre'].capitalize(), recommended_tvshow['rating'])
-db.session.add(new_recommendation)
-db.session.commit()
+# new_recommendation = Recommendation(','.join(top_5_genres), 'Movie', recommended_movie)
+# new_recommendation = Recommendation(','.join(top_5_genres), 'TV Show', recommended_tvshow)
+# db.session.add(new_recommendation)
+# db.session.commit()
 
 if __name__ == '__main__':
     app.run(debug=True, port=3000)
