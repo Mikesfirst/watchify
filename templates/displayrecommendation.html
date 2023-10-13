@@ -12,6 +12,7 @@
     <title>Watchify: Your Customized Movie/TV Show Recommendation</title>
 </header>
 <body>
+{% if choice == "" %}
 <h1>Would you like a movie or TV show recommendation?</h1>
     <form action="/recommendation" method="post">
         <input type="radio" name="choice" value="movie" id="movie" required>
@@ -21,6 +22,10 @@
         <input type="submit" value="Get Recommendation">
     </form>
     <footer>
+  {% else %}
+  <h1>CHOICE HAS BEEN MADE!</h1>
+  {% endif %}
+
         <a href="{{ url_for('index') }}">Back to Home</a>
       </footer>
 </body>
