@@ -22,8 +22,25 @@
         <input type="submit" value="Get Recommendation">
     </form>
     <footer>
-  {% else %}
-  <h1>CHOICE HAS BEEN MADE!</h1>
+  {% elif choice == "movie" %}
+    <h2>Recommended Movie: {{ recommended_movie['movie_name'] }}</h2>
+    <p>Year: {{ recommended_movie['year'] }}</p>
+    <p>Genre: {{ recommended_movie['genre'] }}</p>
+    <p>Rating: {{ recommended_movie['rating'] }}</p>
+    <p>Description: {{ recommended_movie['description'] }}</p>
+    <p>Director: {{ recommended_movie['director'] }}</p>
+
+    {% elif choice == "tvshow" %}
+    <h2>Recommended TV Show: {{ recommended_show['title'] }}</h2>
+    <p>Year: {{ recommended_show['year'] }}</p>
+    <p>Certificate: {{ recommended_show['certificate'] }}</p>
+    <p>Duration: {{ recommended_show['duration'] }}</p>
+    <p>Genre: {{ recommended_show['genre'] }}</p>
+    <p>Rating: {{ recommended_show['rating'] }}</p>
+    <p>Description: {{ recommended_show['description'] }}</p>
+    <p>Stars: {{ recommended_show['stars'] }}</p>
+    <p>Votes: {{ recommended_show['votes'] }}</p>
+    
   {% endif %}
 
         <a href="{{ url_for('index') }}">Back to Home</a>
