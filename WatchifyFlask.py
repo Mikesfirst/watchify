@@ -199,52 +199,38 @@ def recommendation():
 
     #sp = spotipy.Spotify(auth=token)
     if request.method == 'POST':
-        print('WE ARE NOW IN POST!!!!!!!')
         choice = request.form.get('choice')
         if choice == "movie":
             genre_mapping = movie_genre_mapping
         elif choice == "tvshow":
             genre_mapping = tvshow_genre_mapping
         selection_of_genres = []
-        print('top_5_genres', top_5_genres)
         for spotify_genre in top_5_genres:
             spotify_genre = spotify_genre.split()
-            print(spotify_genre)
             for word in spotify_genre:  
                 if word in genre_mapping:
                     for corresponding_genre in genre_mapping[word]:
                         if corresponding_genre not in selection_of_genres:
                             selection_of_genres.append(corresponding_genre)
 
-        print('selection_of_genres', selection_of_genres)
         if len(selection_of_genres) > 0:
             genre_choice = random.choice(selection_of_genres)
         else:
             genre_choice = random.choice(list(genre_mapping.values()))
         if choice == "movie":
-            print(genre_choice.lower())
             df = pd.read_csv('combined_movies.csv') 
-            df_filtered = df[(df['rating'] >= 8) & (df['genre'] == genre_choice.lower())]
-            print('Filtered DataFrame:', df_filtered)
+            df_filtered = df[(df['genre'] == genre_choice.lower())]
             recommended_movie = df_filtered.sample().iloc[0]
-            print('recommended_movie', recommended_movie) 
             return render_template('displayrecommendation.html', recommended_movie=recommended_movie, choice=choice)
         # # TV Show Filtering
         elif choice == "tvshow":
             print(genre_choice)
             df = pd.read_csv('tvshowdata.csv') 
             df_filtered = df[(df['rating'] >= 7.0) & df['genre'].str.contains(genre_choice)]
-            print('Filtered DataFrame:', df_filtered)
             recommended_show = df_filtered.sample().iloc[0]
             return render_template('displayrecommendation.html', recommended_show=recommended_show, choice=choice)
     else:
         return render_template('displayrecommendation.html', choice=choice)
-
-
-# new_recommendation = Recommendation(','.join(top_5_genres), 'Movie', recommended_movie)
-# new_recommendation = Recommendation(','.join(top_5_genres), 'TV Show', recommended_tvshow)
-# db.session.add(new_recommendation)
-# db.session.commit()
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
