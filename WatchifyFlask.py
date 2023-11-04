@@ -13,7 +13,6 @@ import random
 app = Flask(__name__)
 app.secret_key = 'SECRET_KEY'
 
-top_5_genres = ''
 genre_count = {}
 recommended_tvshow = []
 recommended_movie = []
@@ -187,12 +186,12 @@ def display_history():
               genre_count[genre] = 1
 
     # Ensure that the genres from Spotify are in lowercase for the mapping.
+    global top_5_genres 
     top_5_genres = [genre.lower() for genre in sorted(genre_count, key=genre_count.get, reverse=True)[:5]]
     return render_template('displayhistory.html', top_5_genres=top_5_genres)
 
 @app.route('/recommendation', methods=['GET', 'POST'])
 def recommendation():
-    print("Request Method:", request.method)
     choice = ""
     token = session.get('token')
     if not token:
@@ -201,81 +200,37 @@ def recommendation():
     #sp = spotipy.Spotify(auth=token)
     if request.method == 'POST':
         choice = request.form.get('choice')
-        matching_genres_weighted = []
-
-        # Identify the appropriate genre mapping based on choice
         if choice == "movie":
             genre_mapping = movie_genre_mapping
         elif choice == "tvshow":
             genre_mapping = tvshow_genre_mapping
-
-        # Loop through each Spotify genre and weight the movie genres
         selection_of_genres = []
         for spotify_genre in top_5_genres:
-            # Check if the Spotify genre exists in the mapping
-            if spotify_genre in genre_mapping:
-                for corresponding_genre in genre_mapping[spotify_genre]:
-                    selection_of_genres.append(corresponding_genre)
+            spotify_genre = spotify_genre.split()
+            for word in spotify_genre:  
+                if word in genre_mapping:
+                    for corresponding_genre in genre_mapping[word]:
+                        if corresponding_genre not in selection_of_genres:
+                            selection_of_genres.append(corresponding_genre)
+
         if len(selection_of_genres) > 0:
             genre_choice = random.choice(selection_of_genres)
         else:
             genre_choice = random.choice(list(genre_mapping.values()))
-        
-        # Movie Filtering
-        # if choice == "movie":
-        #     df = pd.read_csv('') # Change
-        #     df = df[(df['rating'] >= 8) & (df['votes'] >= 20000)]
-        #     # Filter movies using case-insensitive matching
-        #     filtered_movies = df[df['genre'].str.lower().str.contains('|'.join([g.lower() for g in matching_genres_weighted]))]
-        #     if filtered_movies.empty:
-        #         print("No movies found matching the criteria.")
-        #     else:
-        #         recommended_genre = random.choice(matching_genres_weighted)
-        #         filtered_genre_movies = filtered_movies[filtered_movies['genre'].str.lower().str.contains(recommended_genre.lower())]
-        #         if not filtered_genre_movies.empty:
-        #             recommended_movie = filtered_genre_movies.sample().iloc[0]
-        #         else:
-        #             print("No movies found for the genre:", recommended_genre)
-        #         return
-        #     print(f"Recommended Movie: {recommended_movie} (Genre: {recommended_movie}, Rating: {recommended_movie}")
-        #     # leaving this here for now just cleaning up the code//save_recommendation(top_5_genres, 'Movie', recommended_movie['movie_name'], recommended_movie['genre'].capitalize(), recommended_movie['rating']) 
-
+        if choice == "movie":
+            df = pd.read_csv('combined_movies.csv') 
+            df_filtered = df[(df['genre'] == genre_choice.lower())]
+            recommended_movie = df_filtered.sample().iloc[0]
+            return render_template('displayrecommendation.html', recommended_movie=recommended_movie, choice=choice)
         # # TV Show Filtering
-        # elif choice == "tvshow":
-        #     df = pd.read_csv(' ', on_bad_lines='warn') # Change
-        #     df_copy = df.copy()
-        #     df_copy['votes'] = df_copy['votes'].astype(str)
-        #     df_copy['votes'] = df_copy['votes'].str.replace(',', '').astype(float)
-        #     df_copy.loc[df_copy['votes'].notna(), 'votes'] = df_copy['votes'].dropna().astype(int)
-        #     df_copy['genre'] = df_copy['genre'].astype(str)
-
-        #     # Filter TV shows using case-insensitive matching
-        #     filtered_tvshows = df_copy[df_copy['genre'].str.split(', ').apply(lambda x: bool(set([y.lower() for y in x]) & set([g.lower() for g in matching_genres_weighted])) if x != 'nan' else False)]
-        #     filtered_tvshows = filtered_tvshows[filtered_tvshows['rating'] >= 8]
-        #     filtered_tvshows = filtered_tvshows[filtered_tvshows['votes'] >= 20000]
-        #     if filtered_tvshows.empty:
-        #         print("No TV shows found matching the criteria.")
-        #     else:
-        #         recommended_genre = random.choice(matching_genres_weighted)
-        #         filtered_genre_tvshows = filtered_tvshows[filtered_tvshows['genre'].str.lower().str.contains(recommended_genre.lower())]
-        #         if not filtered_genre_tvshows.empty:
-        #             recommended_show = filtered_genre_tvshows.sample().iloc[0]
-        #         else:
-        #             print("No TV shows found for the genre:", recommended_genre)
-        #         return
-        #     earliest_year = str(recommended_show['year']).split('–')[0].strip().replace('-', '')
-        #     print(f"Recommended TV Show: {recommended_show['title']} (Genre: {recommended_genre}, Rating: {recommended_show['rating']}, Release Year: {earliest_year.strip('()')})")
-        recommended_movie = "Star Wars"
-        recommended_show = "How I Met Your Mother"
-        return render_template('displayrecommendation.html', recommended_movie=recommended_movie, recommended_show=recommended_show)
+        elif choice == "tvshow":
+            print(genre_choice)
+            df = pd.read_csv('tvshowdata.csv') 
+            df_filtered = df[(df['rating'] >= 7.0) & df['genre'].str.contains(genre_choice)]
+            recommended_show = df_filtered.sample().iloc[0]
+            return render_template('displayrecommendation.html', recommended_show=recommended_show, choice=choice)
     else:
         return render_template('displayrecommendation.html', choice=choice)
-
-
-# new_recommendation = Recommendation(','.join(top_5_genres), 'Movie', recommended_movie)
-# new_recommendation = Recommendation(','.join(top_5_genres), 'TV Show', recommended_tvshow)
-# db.session.add(new_recommendation)
-# db.session.commit()
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
