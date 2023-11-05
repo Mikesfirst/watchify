@@ -1,32 +1,92 @@
-<!-- Page 3: Display Spotify History -->
-<!-- https://shamp00the-cat.github.io/movierecs/-->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Watchify: Your Musical Journey</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Spotify Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  <!-- Custom CSS -->
+  <style>
+    body, h1, h2, li {
+      font-family: 'Montserrat', sans-serif;
+    }
+    .genre-wheel-container {
+      position: relative;
+      text-align: center;
+      width: 500px; /* Set width to 500px as requested */
+      height: 500px; /* Ensure the aspect ratio is correct */
+      margin: auto;
+    }
+    .genre-wheel {
+      width: 100%;
+      height: 100%;
+    }
+    .spotify-logo {
+      width: 60px; /* Adjust if needed */
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .genre-text {
+      position: absolute;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #333;
+      white-space: nowrap;
+    }
+    /* Adjust these positions according to the new wheel size */
+    .genre-text[data-genre="1"] { top: 10%; left: 25%; }
+    .genre-text[data-genre="2"] { top: 30%; right: 25%; }
+    .genre-text[data-genre="3"] { bottom: 50%; left: 25%; }
+    .genre-text[data-genre="4"] { bottom: 30%; right: 25%; }
+    .genre-text[data-genre="5"] { bottom: 10%; left: 25%; }
+
+    footer {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .watchify-logo {
+      width: 30px; /* Adjust the size for the Watchify logo */
+      vertical-align: middle;
+    }
+  </style>
 </head>
-<header>
-    <title>Watchify: Your Musical Journey</title>
-</header>
 <body>
-    <header>
-        <h1>Your Musical Journey</h1>
-        <h2>Visualize Your 30-Day Spotify Listening History</h2>
-    </header>
-    <main>
-        <h1>Your Top 5 Genres for the Past 30 Days are:</h1>
-    <ul>
-        {% for genre in top_5_genres %}
-            <li>{{ genre }}</li>
-        {% endfor %}
-    </ul>
+  <header class="text-center">
+    <h1>Your Musical Journey</h1>
+    <h2>Visualize Your 30-Day Spotify Listening History</h2>
+  </header>
+  <main class="container">
+    <h1>Your Top 5 Genres for the Past 30 Days are:</h1>
+    <div class="genre-wheel-container my-5">
+      <img src="your-genre-wheel.jpg" class="genre-wheel img-fluid" alt="Genre Wheel">
+      <img src="your-spotify-logo.png" class="spotify-logo" alt="Spotify Logo">
+      <!-- Genre Text Overlays -->
+      <div class="genre-text" data-genre="1">Rock</div>
+      <div class="genre-text" data-genre="2">Pop</div>
+      <div class="genre-text" data-genre="3">EDM</div>
+      <div class="genre-text" data-genre="4">Indie</div>
+      <div class="genre-text" data-genre="5">Classical</div>
+    </div>
     <p>Immerse yourself in the visual representation of your Spotify listening history over the last month...</p>
-        <footer>
-            <a href="{{ url_for('recommendation') }}">Proceed to Recommendations</a>
-        </footer>
-    </main>
-</body>
-</html>
+  </main>
+  <footer>
+    <div>POWERED BY: <span class="watchify-logo">WATCHIFY</span></div>
+    <div>
+      <button id="downloadBtn">Download</button>
+      <button id="shareBtn">Share</button>
+    </div>
+  </footer>
+
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+  <!-- html2canvas for capturing the genre-wheel-container as an image -->
+  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const downloadButton = document.getElementById('downloadBtn');
