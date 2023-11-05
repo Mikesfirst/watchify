@@ -1,3 +1,6 @@
+<!-- Page 3: Top 5 Genres Over Past 30 Days -->
+<!-- https://shamp00the-cat.github.io/movierecs/-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,79 +17,91 @@
     body, h1, h2, li {
       font-family: 'Montserrat', sans-serif;
     }
-    .genre-wheel-container {
-      position: relative;
-      text-align: center;
-      width: 500px; /* Set width to 500px as requested */
-      height: 500px; /* Ensure the aspect ratio is correct */
-      margin: auto;
+    body {
+      text-align: center; /* Center text globally */
+      background: #fff; /* White background */
+      color: #000; /* Black text color */
     }
-    .genre-wheel {
-      width: 100%;
-      height: 100%;
-    }
-    .spotify-logo {
-      width: 60px; /* Adjust if needed */
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-    .genre-text {
-      position: absolute;
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #333;
-      white-space: nowrap;
-    }
-    /* Adjust these positions according to the new wheel size */
-    .genre-text[data-genre="1"] { top: 10%; left: 25%; }
-    .genre-text[data-genre="2"] { top: 30%; right: 25%; }
-    .genre-text[data-genre="3"] { bottom: 50%; left: 25%; }
-    .genre-text[data-genre="4"] { bottom: 30%; right: 25%; }
-    .genre-text[data-genre="5"] { bottom: 10%; left: 25%; }
-
-    footer {
-      text-align: center;
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Center content vertically in main */
       margin-top: 20px;
     }
-    .watchify-logo {
-      width: 30px; /* Adjust the size for the Watchify logo */
-      vertical-align: middle;
+    .genre-image {
+      background-image: url('sunglasses.png'); /* Replace with the path to the sunglasses image */
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      width: 100%;
+      max-width: 500px; /* Max width for the sunglasses image */
+      height: 500px; /* Height for the sunglasses image */
+      position: relative;
+    }
+    .spotify-logo {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      max-width: 50px; /* Adjust the size as necessary, keeping it responsive */
+      width: 20%; /* Width as a percentage of its parent */
+      height: auto;
+    }
+    .genre-label {
+      position: absolute;
+      color: #000; /* Black color for the genre labels */
+      font-size: 2vw; /* Responsive font size */
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    /* Position each genre label */
+    .genre-1 { top: 20%; left: 15%; }
+    .genre-2 { top: 20%; right: 15%; }
+    .genre-3 { bottom: 20%; left: 15%; }
+    .genre-4 { bottom: 20%; right: 15%; }
+    .genre-5 { bottom: 50%; left: 42%; }
+    footer {
+      margin-top: 20px;
+      padding-bottom: 40px; /* Adds space between the button and the end of the page */
+    }
+    footer a {
+      display: block;
+      background-color: #1DB954; /* Spotify green color */
+      color: white;
+      box-shadow: 2px 2px 4px #000000;
+      font-weight: bold;
+      text-transform: uppercase;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 20px; /* Rounded corners for the button */
+      width: fit-content;
+      margin: 0 auto; /* Center the button */
+    }
+    .paragraph {
+      max-width: 60%; /* Sets the max width of the paragraph content */
+      margin: 0 auto; /* Centers the paragraph */
+      margin-top: 20px; /* Adds a bit of spacing above the paragraph */
     }
   </style>
 </head>
 <body>
-  <header class="text-center">
+  <header>
     <h1>Your Musical Journey</h1>
     <h2>Visualize Your 30-Day Spotify Listening History</h2>
   </header>
   <main class="container">
-    <h1>Your Top 5 Genres for the Past 30 Days are:</h1>
-    <div class="genre-wheel-container my-5">
-      <img src="your-genre-wheel.jpg" class="genre-wheel img-fluid" alt="Genre Wheel">
-      <img src="your-spotify-logo.png" class="spotify-logo" alt="Spotify Logo">
-      <!-- Genre Text Overlays -->
-      <div class="genre-text" data-genre="1">Rock</div>
-      <div class="genre-text" data-genre="2">Pop</div>
-      <div class="genre-text" data-genre="3">EDM</div>
-      <div class="genre-text" data-genre="4">Indie</div>
-      <div class="genre-text" data-genre="5">Classical</div>
+    <div class="genre-image">
+      <img src="spotifylogo2.png" alt="Spotify Logo" class="spotify-logo">
+      {% for genre in top_5_genres %}
+        <div class="genre-label genre-{{ loop.index }}">{{ genre }}</div>
+      {% endfor %}
     </div>
-    <p>Immerse yourself in the visual representation of your Spotify listening history over the last month...</p>
+    <p class="paragraph">Immerse yourself in the visual representation of your Spotify listening history over the last month.</p>
+    <footer>
+      <a href="{{ url_for('recommendation') }}">Proceed to Recommendations</a>
+    </footer>
   </main>
-  <footer>
-    <div>POWERED BY: <span class="watchify-logo">WATCHIFY</span></div>
-    <div>
-      <button id="downloadBtn">Download</button>
-      <button id="shareBtn">Share</button>
-    </div>
-  </footer>
-
   <!-- Bootstrap Bundle with Popper -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
-  <!-- html2canvas for capturing the genre-wheel-container as an image -->
-  <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const downloadButton = document.getElementById('downloadBtn');
+</body>
+</html>
