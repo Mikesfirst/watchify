@@ -57,19 +57,19 @@
       margin: 0.5em 0;
     }
 
-    .login-form {
+    .login-container {
       margin: 20px 0;
       display: flex; /* Added to make it a flex container */
       justify-content: center; /* Centers the button horizontally */
       flex-direction: column; /* Aligns the children (inputs and button) in a column */
     }
 
-    .login-form input {
+    .login-container input {
       margin-bottom: 10px;
       width: 100%; /* Ensures full width inside flex container */
     }
 
-    .login-form button {
+    .login-container button {
       background-color: #1DB954;
       border: none;
       font-family: 'Montserrat', sans-serif;
@@ -85,7 +85,7 @@
       cursor: pointer; /* Shows a pointer on hover for better UX */
     }
 
-    .login-form button img {
+    .login-container button img {
       height: 30px; /* Adjust logo size */
       width: 90px;
       margin-left: 9px; /* Space between text and logo */
@@ -112,14 +112,10 @@
       <h2>Login</h2>
       <p>Use Your Spotify Credentials</p>
     </div>
-    <form class="login-form">
-      <input type="email" class="form-control" placeholder="Email/Username">
-      <input type="password" class="form-control" placeholder="Password">
-      <button type="submit" class="btn">
+      <button type="submit" class="btn" formaction="{{ auth_url }}">
         Login with
         <img src="spotifylogo.svg" alt="Spotify Logo">
       </button>
-    </form>
   </div>
 </div>
 
