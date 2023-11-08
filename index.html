@@ -11,16 +11,12 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="static/indexcss.css">
     
-    {% block additional_head %} 
-    <!-- Any additional head content can go here -->
-    {% endblock additional_head %}
 </head>
 <body>
     <header>
         <img src="static/images/Logotype.png" alt="Watchify Logo" width="200">
         <h5>Where Your Music Meets the Screen</h5>
     </header>
-    {% block content %}
     <main class="container">
         <p>
             Experience a world where your music listening history transforms into customized visual stories. At
@@ -39,6 +35,5 @@
             <a href="{{ url_for('login') }}" class="btn btn-success">Proceed to Login</a>
         </footer>
     </main>
-    {% endblock content %}
 </body>
 </html>
