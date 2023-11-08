@@ -9,15 +9,15 @@
     <!-- Spotify Font -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/indexcss.css') }}">
-
-    {% block additional_head %}
+    <link rel="stylesheet" href="static/indexcss.css">
+    
+    {% block additional_head %} 
     <!-- Any additional head content can go here -->
     {% endblock additional_head %}
 </head>
 <body>
     <header>
-        <img src="{{ url_for('static', filename='images/Logotype.png') }}" alt="Watchify Logo" width="200" height="200">
+        <img src="static/images/Logotype.png" alt="Watchify Logo" width="200">
         <h5>Where Your Music Meets the Screen</h5>
     </header>
     {% block content %}
