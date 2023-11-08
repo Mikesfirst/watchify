@@ -1,17 +1,16 @@
 from flask import Flask, render_template, request, redirect, url_for, session
+from flask_bootstrap import Bootstrap
 from os import environ
-#from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
 import random
 
-# Load environment variables from .env file
-#load_dotenv('.env')
-
 app = Flask(__name__)
 app.secret_key = 'SECRET_KEY'
+
+bootstrap = Bootstrap(app)
 
 genre_count = {}
 recommended_tvshow = []

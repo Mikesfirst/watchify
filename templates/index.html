@@ -1,84 +1,51 @@
 <!-- Page 1: Index -->
 <!-- https://shamp00the-cat.github.io/movierecs/-->
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- Bootstrap CSS -->
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Spotify Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 
-  <!-- Spotify Font -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-  <!-- Custom CSS -->
+{% extends "bootstrap/base.html" %}
 
-  <style>
-    body {
-      background-color: white;
-      font-family: 'Montserrat', sans-serif;
-    }
-    
-    header {
-      background-color: #1DB954;
-      color: white;
-      text-align: center;
-      padding: 20px 0;
-    }
-    main {
-      padding: 20px;
-      color: black;
-    }
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-    li {
-      background-color: #f0f0f0;
-      margin: 5px 0;
-      padding: 10px;
-      border: 1px solid #ddd;
-    }
-    footer a {
-      display: inline-block;
-      margin: 20px 0;
-      padding: 10px 20px;
-      background-color: #1DB954;
-      color: white;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-  </style>
-</head>
+{% block head %}
+{{ super() }}
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+{% endblock %}
+
+{% block title %}Watchify{% endblock %}
+
+{% block body %}
 <body>
-  <header>
-    <h1>Welcome to Watchify!</h1>
-    <h2>Where Your Music Meets the Screen</h2>
-  </header>
-  <main>
-    <p>
-      Experience a world where your music listening history transforms into
-      customized visual stories. At Watchify, explore the unique connection
-      between your Spotify listening trends and tailored movie or TV show
-      recommendations...
-    </p>
-    <ul>
-      <li>Effortless Login</li>
-      <li>Visualize Listening History</li>
-      <li>Personalized Recommendations</li>
-      <li>Downloadable Graphics</li>
-    </ul>
-    <footer>
-      <a href="{{ url_for('login') }}">Proceed to Login</a>
-    </footer>
-  </main>
-
-  <!-- Bootstrap JS, Popper.js, and jQuery -->
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <header>
+        <img src="{{ url_for('static', filename='images/Logotype.png') }}" alt="Watchify Logo" width="200" height="200">
+        <h5>Where Your Music Meets the Screen</h5>
+    </header>
+    <main class="container">
+        <p>
+            Experience a world where your music listening history transforms into customized visual stories. At
+            Watchify, explore the unique connection between your Spotify listening trends and tailored movie or TV
+            show recommendations.
+        </p>
+        <div class="box-container">
+            <ul class="list-group">
+                <li class="list-group-item">Effortless Login</li>
+                <li class="list-group-item">Visualize Listening History</li>
+                <li class="list-group-item">Personalized Recommendations</li>
+                <li class="list-group-item">Downloadable Graphics</li>
+            </ul>
+        </div>
+        <footer class="text-center">
+            <a href="{{ url_for('login') }}" class="btn btn-success">Proceed to Login</a>
+        </footer>
+    </main>
 </body>
-</html>
+{% endblock %}
