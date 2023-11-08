@@ -1,6 +1,3 @@
-<!-- Page 2: Login with Spotify Credentials -->
-<!-- https://shamp00the-cat.github.io/movierecs/-->
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -117,7 +114,7 @@
           <h2>Login</h2>
           <p>Use Your Spotify Credentials</p>
         </div>
-        <button type="button" class="btn" formaction="{{ auth_url }}">
+        <button class="btn" onclick="window.location.href='{{ auth_url }}'">
           Login with
           <img src="spotifylogo.svg" alt="Spotify Logo" />
         </button>
