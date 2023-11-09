@@ -50,54 +50,54 @@ class Recommendation(db.Model):
 
 # Movie Genre Mapping
 movie_genre_mapping = {
-    'pop': ['Comedy', 'Romance'],
-    'art pop': ['Fantasy', 'Drama'],
-    'reggaeton': ['Action', 'Adventure'],
-    'urbano latino': ['Action', 'Drama'],
-    'trap latino': ['Crime', 'Action'],
-    'rock': ['Action', 'Adventure'],
-    'indie rock': ['Drama', 'Romance'],
+    'pop': ['Romance', 'Comedy', 'Family'],
+    'art pop': ['Fantasy', 'Drama', 'Adventure'],
+    'reggaeton': ['Action', 'Adventure', 'Crime'],
+    'urbano latino': ['Action', 'Drama', 'Romance'],
+    'trap latino': ['Crime', 'Action', 'Thriller'],
+    'rock': ['Action', 'Adventure', 'Drama'],
+    'indie rock': ['Drama', 'Romance', 'Comedy'],
     'classical': ['History', 'Biography'],
-    'hip hop': ['Drama', 'Crime'],
-    'jazz': ['Drama', 'Biography'],
-    'country': ['Drama', 'Family'],
-    'electronic': ['Sci-Fi', 'Mystery'],
-    'metal': ['Horror', 'Thriller'],
-    'folk': ['Drama', 'History'],
-    'blues': ['Drama', 'Crime'],
-    'r&b': ['Romance', 'Drama'],
-    'soul': ['Drama', 'Romance'],
-    'punk': ['Action', 'Thriller'],
-    'disco': ['Comedy', 'Romance'],
-    'house': ['Sci-Fi', 'Thriller'],
-    'techno': ['Sci-Fi', 'Action'],
-    'edm': ['Action', 'Sci-Fi'],
-    'latin': ['Drama', 'Romance'],
-    'reggae': ['Comedy', 'Adventure'],
-    'funk': ['Comedy', 'Action'],
-    'k-pop': ['Comedy', 'Romance'],
-    'psychedelic': ['Fantasy', 'Adventure'],
-    'world': ['History', 'Family'],
-    'ambient': ['Drama', 'Sci-Fi'],
-    'lo-fi beats': ['Drama', 'Romance'],
-    'vaporwave': ['Sci-Fi', 'Fantasy'],
-    'emo': ['Drama', 'Romance'],
-    'hardcore': ['Action', 'Thriller'],
-    'dubstep': ['Action', 'Sci-Fi'],
-    'ska': ['Comedy', 'Adventure'],
-    'swing': ['Comedy', 'Romance'],
-    'trance': ['Sci-Fi', 'Adventure'],
-    'grime': ['Crime', 'Action'],
-    'bluegrass': ['Drama', 'Adventure'],
-    'new wave': ['Sci-Fi', 'Romance'],
-    'post-punk': ['Drama', 'Thriller'],
-    'trip hop': ['Mystery', 'Drama'],
-    'neosoul': ['Romance', 'Drama'],
-    'afrobeat': ['Drama', 'Adventure'],
-    'chillhop': ['Drama', 'Romance'],
-    'synthwave': ['Sci-Fi', 'Action'],
-    'latin viral pop': ['Comedy', 'Adventure'],
-    'r&b en espanol': ['Romance', 'Drama']
+    'hip hop': ['Drama', 'Crime', 'Action'],
+    'jazz': ['Drama', 'Biography', 'Romance'],
+    'country': ['Drama', 'Family', 'Romance'],
+    'electronic': ['Science Fiction', 'Mystery', 'Action'],
+    'metal': ['Horror', 'Thriller', 'Action'],
+    'folk': ['Drama', 'History', 'Romance'],
+    'blues': ['Drama', 'Crime', 'Romance'],
+    'r&b': ['Romance', 'Drama', 'Comedy'],
+    'soul': ['Drama', 'Romance', 'Comedy'],
+    'punk': ['Action', 'Thriller', 'Comedy'],
+    'disco': ['Comedy', 'Romance', 'Action'],
+    'house': ['Science Fiction', 'Thriller', 'Action'],
+    'techno': ['Science Fiction', 'Action', 'Mystery'],
+    'edm': ['Action', 'Science Fiction', 'Thriller'],
+    'latin': ['Drama', 'Romance', 'Comedy'],
+    'reggae': ['Comedy', 'Adventure', 'Action'],
+    'funk': ['Comedy', 'Action', 'Romance'],
+    'k-pop': ['Comedy', 'Romance', 'Action'],
+    'psychedelic': ['Fantasy', 'Adventure', 'Action'],
+    'world': ['History', 'Family', 'Adventure'],
+    'ambient': ['Drama', 'Science Fiction', 'Mystery'],
+    'lo-fi beats': ['Drama', 'Romance', 'Comedy'],
+    'vaporwave': ['Science Fiction', 'Fantasy', 'Romance'],
+    'emo': ['Drama', 'Romance', 'Thriller'],
+    'hardcore': ['Action', 'Thriller', 'Crime'],
+    'dubstep': ['Action', 'Science Fiction', 'Horror'],
+    'ska': ['Comedy', 'Adventure', 'Action'],
+    'swing': ['Comedy', 'Romance', 'Action'],
+    'trance': ['Science Fiction', 'Adventure', 'Action'],
+    'grime': ['Crime', 'Action', 'Thriller'],
+    'bluegrass': ['Drama', 'Adventure', 'Romance'],
+    'new wave': ['Science Fiction', 'Romance', 'Action'],
+    'post-punk': ['Drama', 'Thriller', 'Action'],
+    'trip hop': ['Mystery', 'Drama', 'Romance'],
+    'neosoul': ['Romance', 'Drama', 'Comedy'],
+    'afrobeat': ['Drama', 'Adventure', 'Romance'],
+    'chillhop': ['Drama', 'Romance', 'Comedy'],
+    'synthwave': ['Science Fiction', 'Action', 'Thriller'],
+    'latin viral pop': ['Comedy', 'Adventure', 'Romance'],
+    'r&b en espanol': ['Romance', 'Drama', 'Comedy']
 }
 
 # Genre mapping for TV Shows
@@ -198,32 +198,38 @@ def recommendation():
 
     #sp = spotipy.Spotify(auth=token)
     if request.method == 'POST':
+        #Obtains the user choice from the post request
         choice = request.form.get('choice')
         if choice == "movie":
             genre_mapping = movie_genre_mapping
         elif choice == "tvshow":
             genre_mapping = tvshow_genre_mapping
         selection_of_genres = []
+        #Goes through the user's top genres
         for spotify_genre in top_5_genres:
+            #Splits up the string into individual words
             spotify_genre = spotify_genre.split()
             for word in spotify_genre:  
+                #checks to see if one of the words in the genre string is in our dictionary
                 if word in genre_mapping:
                     for corresponding_genre in genre_mapping[word]:
+                         #Goes through the list in the corresponding dictionary key
                         if corresponding_genre not in selection_of_genres:
                             selection_of_genres.append(corresponding_genre)
 
+        #If no genre was found, it picks a random one
         if len(selection_of_genres) > 0:
             genre_choice = random.choice(selection_of_genres)
         else:
             genre_choice = random.choice(list(genre_mapping.values()))
         if choice == "movie":
             df = pd.read_csv('combined_movies.csv') 
-            df_filtered = df[(df['genre'] == genre_choice.lower())]
+            #filters CSV files by genre and movies with a value in genre
+            df_filtered = df[df['genres'].notna() & df['genres'].str.contains(genre_choice)]
             recommended_movie = df_filtered.sample().iloc[0]
-            return render_template('displayrecommendation.html', recommended_movie=recommended_movie, choice=choice)
+            return render_template('displayrecommendation.html', recommended_movie=recommended_movie, choice=choice, genre_choice=genre_choice)
         # # TV Show Filtering
         elif choice == "tvshow":
-            print(genre_choice)
             df = pd.read_csv('tvshowdata.csv') 
             df_filtered = df[(df['rating'] >= 7.0) & df['genre'].str.contains(genre_choice)]
             recommended_show = df_filtered.sample().iloc[0]

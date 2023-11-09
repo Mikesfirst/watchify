@@ -23,12 +23,11 @@
     </form>
     <footer>
   {% elif choice == "movie" %}
-    <h2>Recommended Movie: {{ recommended_movie['movie_name'] }}</h2>
-    <p>Year: {{ recommended_movie['year'] }}</p>
-    <p>Genre: {{ recommended_movie['genre'] }}</p>
-    <p>Rating: {{ recommended_movie['rating'] }}</p>
-    <p>Description: {{ recommended_movie['description'] }}</p>
-    <p>Director: {{ recommended_movie['director'] }}</p>
+    <h2>Recommended Movie: {{ recommended_movie['title'] }}</h2>
+    <p>Year: {{ recommended_movie['release_year'] }}</p>
+    <p>Genre: {{ genre_choice }}</p>
+    <p>Rating: {{ recommended_movie['vote_average'] }}</p>
+    <p>Description: {{ recommended_movie['overview'] }}</p>
 
     {% elif choice == "tvshow" %}
     <h2>Recommended TV Show: {{ recommended_show['title'] }}</h2>
