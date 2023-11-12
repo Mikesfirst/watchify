@@ -12,6 +12,7 @@
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
   <!-- Spotify Font -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  
   <!-- Custom CSS -->
   <style>
     body, h1, h2, li {
@@ -77,31 +78,37 @@
       width: fit-content;
       margin: 0 auto; /* Center the button */
     }
-    .paragraph {
-      max-width: 60%; /* Sets the max width of the paragraph content */
-      margin: 0 auto; /* Centers the paragraph */
-      margin-top: 20px; /* Adds a bit of spacing above the paragraph */
-    }
-  </style>
+
+  header h2 {
+  margin-bottom: 0; /* Removes bottom margin from the h2 */
+  margin-top: 0;
+  }
+
+  .paragraph {
+  margin-top: 0.5em; /* Adds a small space above the paragraph, adjust as needed */
+  max-width: 60%;
+  margin-left: auto; /* Centers the paragraph */
+  margin-right: auto;
+  }
+
+</style>
 </head>
 <body>
   <header>
     <h1>Your Musical Journey</h1>
     <h2>Visualize Your 30-Day Spotify Listening History</h2>
+    <p class="paragraph">Immerse yourself in the visual representation of your Spotify listening history over the last month.</p>
   </header>
   <main class="container">
     <div class="genre-image">
-      <img src="spotifylogo2.png" alt="Spotify Logo" class="spotify-logo">
+      <img src="{{ url_for('static', filename='spotifylogo2.png') }}" alt="Spotify Logo" class="spotify-logo">
       {% for genre in top_5_genres %}
         <div class="genre-label genre-{{ loop.index }}">{{ genre }}</div>
       {% endfor %}
     </div>
-    <p class="paragraph">Immerse yourself in the visual representation of your Spotify listening history over the last month.</p>
     <footer>
       <a href="{{ url_for('recommendation') }}">Proceed to Recommendations</a>
     </footer>
   </main>
-  <!-- Bootstrap Bundle with Popper -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
