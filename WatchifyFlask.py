@@ -6,6 +6,8 @@ from spotipy.oauth2 import SpotifyOAuth
 from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
 import random
+import requests
+import json
 
 app = Flask(__name__)
 app.secret_key = 'SECRET_KEY'
@@ -30,6 +32,11 @@ sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
                         client_secret=SPOTIPY_CLIENT_SECRET,
                         redirect_uri=SPOTIPY_REDIRECT_URI,
                         scope=["user-top-read"])
+
+# DALL-E API endpoint and API Key (replace 'YOUR_API_KEY' with your actual API key)
+DALL_E_API_ENDPOINT = "https://api.openai.com/v1/images/generations"
+DALL_E_API_KEY = "YOUR_API_KEY"
+
 # DB Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@YOUR_RDS_ENDPOINT:5432/watchify' # change
 db = SQLAlchemy(app)
@@ -152,6 +159,22 @@ tvshow_genre_mapping = {
     'r&b en espanol': ['Drama', 'Music']
 }
 
+def generate_dalle_image(prompt):
+    headers = {
+        "Authorization": f"Bearer {DALL_E_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    data = {
+        "prompt": prompt,
+        "n": 1,
+        "size": "200x200"
+    }
+    response = requests.post(DALL_E_API_ENDPOINT, headers=headers, data=json.dumps(data))
+    if response.status_code == 200:
+        image_data = response.json()['data'][0]['image']
+        return image_data
+    else:
+        return None
 
 @app.route('/')
 def index():
@@ -234,8 +257,19 @@ def recommendation():
             df_filtered = df[(df['rating'] >= 7.0) & df['genre'].str.contains(genre_choice)]
             recommended_show = df_filtered.sample().iloc[0]
             return render_template('displayrecommendation.html', recommended_show=recommended_show, choice=choice)
+        
+def generate_image():
+    title = request.form.get('title')
+    year = request.form.get('year')
+    genre = request.form.get('genre')
+    rating = request.form.get('rating')
+    description = request.form.get('description')
+    prompt = f"{title}, released in {year}, is a {genre} with a rating of {rating}/10. {description}"
+    image_data = generate_dalle_image(prompt)
+    if image_data:
+        return render_template('displayrecommendation.html', image_data=image_data)
     else:
-        return render_template('displayrecommendation.html', choice=choice)
+        return render_template('displayrecommendation.html')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
