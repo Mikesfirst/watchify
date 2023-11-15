@@ -19,8 +19,8 @@ recommended_tvshow = []
 recommended_movie = []
 
 # Spotify API Credentials
-SPOTIPY_CLIENT_ID = '4664c427abef4b7c8701f465a47db317'
-SPOTIPY_CLIENT_SECRET = '68337e55f76140e8a66e3ddc39a9587a'
+SPOTIPY_CLIENT_ID = '55118ada9eb54f9aa5633d24c6e5e0cf'
+SPOTIPY_CLIENT_SECRET = '012b2b6b819a43d895e2b48e59b62d64'
 SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
  #SPOTIPY_REDIRECT_URI = 'https://shamp00the-cat.github.io/movierecs/callback'
 
