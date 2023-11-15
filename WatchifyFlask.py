@@ -19,14 +19,15 @@ recommended_tvshow = []
 recommended_movie = []
 
 # Spotify API Credentials
-# SPOTIPY_CLIENT_ID = 'ecec60c9a316409a84a45c923f7473ee'
-# SPOTIPY_CLIENT_SECRET = '3129b9225476463d86ddc4074cfc8500'
-# SPOTIPY_REDIRECT_URI = 'https://shamp00the-cat.github.io/movierecs/callback'
+ SPOTIPY_CLIENT_ID = 'ecec60c9a316409a84a45c923f7473ee'
+ SPOTIPY_CLIENT_SECRET = '3129b9225476463d86ddc4074cfc8500'
+ SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
+ #SPOTIPY_REDIRECT_URI = 'https://shamp00the-cat.github.io/movierecs/callback'
 
 #Michael's ID just to run locally
-SPOTIPY_CLIENT_ID = "6f8bacd4931e41839442e43813d4fcfb"
-SPOTIPY_CLIENT_SECRET = "bd500cdc7b674c3087c2eadbdb0ec058" 
-SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
+#SPOTIPY_CLIENT_ID = "6f8bacd4931e41839442e43813d4fcfb"
+#SPOTIPY_CLIENT_SECRET = "bd500cdc7b674c3087c2eadbdb0ec058" 
+#SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
 
 sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
                         client_secret=SPOTIPY_CLIENT_SECRET,
