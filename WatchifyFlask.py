@@ -19,15 +19,15 @@ recommended_tvshow = []
 recommended_movie = []
 
 # Spotify API Credentials
-SPOTIPY_CLIENT_ID = '55118ada9eb54f9aa5633d24c6e5e0cf'
-SPOTIPY_CLIENT_SECRET = '012b2b6b819a43d895e2b48e59b62d64'
-SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
+#SPOTIPY_CLIENT_ID = '55118ada9eb54f9aa5633d24c6e5e0cf'
+#SPOTIPY_CLIENT_SECRET = '012b2b6b819a43d895e2b48e59b62d64'
+#SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
  #SPOTIPY_REDIRECT_URI = 'https://shamp00the-cat.github.io/movierecs/callback'
 
 #Michael's ID just to run locally
-#SPOTIPY_CLIENT_ID = "6f8bacd4931e41839442e43813d4fcfb"
-#SPOTIPY_CLIENT_SECRET = "bd500cdc7b674c3087c2eadbdb0ec058" 
-#SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
+SPOTIPY_CLIENT_ID = "6f8bacd4931e41839442e43813d4fcfb"
+SPOTIPY_CLIENT_SECRET = "bd500cdc7b674c3087c2eadbdb0ec058" 
+SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
 
 sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
                         client_secret=SPOTIPY_CLIENT_SECRET,
@@ -56,109 +56,78 @@ class Recommendation(db.Model):
         self.genre = genre
         self.rating = rating
 
-# Movie Genre Mapping
-movie_genre_mapping = {
-    'pop': ['Romance', 'Comedy', 'Family'],
-    'art pop': ['Fantasy', 'Drama', 'Adventure'],
-    'reggaeton': ['Action', 'Adventure', 'Crime'],
-    'urbano latino': ['Action', 'Drama', 'Romance'],
-    'trap latino': ['Crime', 'Action', 'Thriller'],
-    'rock': ['Action', 'Adventure', 'Drama'],
-    'indie rock': ['Drama', 'Romance', 'Comedy'],
-    'classical': ['History', 'Biography'],
-    'hip hop': ['Drama', 'Crime', 'Action'],
-    'jazz': ['Drama', 'Biography', 'Romance'],
-    'country': ['Drama', 'Family', 'Romance'],
-    'electronic': ['Science Fiction', 'Mystery', 'Action'],
-    'metal': ['Horror', 'Thriller', 'Action'],
-    'folk': ['Drama', 'History', 'Romance'],
-    'blues': ['Drama', 'Crime', 'Romance'],
-    'r&b': ['Romance', 'Drama', 'Comedy'],
-    'soul': ['Drama', 'Romance', 'Comedy'],
-    'punk': ['Action', 'Thriller', 'Comedy'],
-    'disco': ['Comedy', 'Romance', 'Action'],
-    'house': ['Science Fiction', 'Thriller', 'Action'],
-    'techno': ['Science Fiction', 'Action', 'Mystery'],
-    'edm': ['Action', 'Science Fiction', 'Thriller'],
-    'latin': ['Drama', 'Romance', 'Comedy'],
-    'reggae': ['Comedy', 'Adventure', 'Action'],
-    'funk': ['Comedy', 'Action', 'Romance'],
-    'k-pop': ['Comedy', 'Romance', 'Action'],
-    'psychedelic': ['Fantasy', 'Adventure', 'Action'],
-    'world': ['History', 'Family', 'Adventure'],
-    'ambient': ['Drama', 'Science Fiction', 'Mystery'],
-    'lo-fi beats': ['Drama', 'Romance', 'Comedy'],
-    'vaporwave': ['Science Fiction', 'Fantasy', 'Romance'],
-    'emo': ['Drama', 'Romance', 'Thriller'],
-    'hardcore': ['Action', 'Thriller', 'Crime'],
-    'dubstep': ['Action', 'Science Fiction', 'Horror'],
-    'ska': ['Comedy', 'Adventure', 'Action'],
-    'swing': ['Comedy', 'Romance', 'Action'],
-    'trance': ['Science Fiction', 'Adventure', 'Action'],
-    'grime': ['Crime', 'Action', 'Thriller'],
-    'bluegrass': ['Drama', 'Adventure', 'Romance'],
-    'new wave': ['Science Fiction', 'Romance', 'Action'],
-    'post-punk': ['Drama', 'Thriller', 'Action'],
-    'trip hop': ['Mystery', 'Drama', 'Romance'],
-    'neosoul': ['Romance', 'Drama', 'Comedy'],
-    'afrobeat': ['Drama', 'Adventure', 'Romance'],
-    'chillhop': ['Drama', 'Romance', 'Comedy'],
-    'synthwave': ['Science Fiction', 'Action', 'Thriller'],
-    'latin viral pop': ['Comedy', 'Adventure', 'Romance'],
-    'r&b en espanol': ['Romance', 'Drama', 'Comedy']
-}
+#Genre Mapping
+genre_mapping = {
+    "Romance": {
+        'valence': 0.378617,
+        'danceability': 0.52972,
+        'energy': 0.45700999999999986,
+    },
+    "Action": {
+        'valence': 0.4782686868686866,
+        'danceability': 0.610616161616162,
+        'energy': 0.7276262626262627,
+    },
+    "Comedy": {
+        'valence': 0.6791019999999999,
+        'danceability': 0.6025000000000003,
+        'energy': 0.754392,
+    },
+    "Science Fiction": {
+        'valence': 0.318779,
+        'danceability': 0.42281799999999997,
+        'energy': 0.426963,
+    },
+    "Horror": {
+        'valence': 0.043389655172413784,
+        'danceability': 0.2253931034482759,
+        'energy': 0.20297327586206892,
+    },
+    "Family": {
+        'valence': 0.39481,
+        'danceability': 0.5041180000000001,
+        'energy': 0.4358320000000002,
+    },
+    "Drama": {
+        'valence': 0.27197200000000005,
+        'danceability': 0.4922300000000001,
+        'energy': 0.4408099999999998,
+    },
+    "Adventure": {
+        'valence': 0.4435835164835165,
+        'danceability': 0.5584285714285715,
+        'energy': 0.6459472527472528,
+    },
+     "Thriller": {
+        'valence': 0.3606849999999999,
+        'danceability': 0.5131299999999999,
+        'energy': 0.5883509999999998,
 
-# Genre mapping for TV Shows
-tvshow_genre_mapping = {
-    'pop': ['Comedy', 'Family'],
-    'art pop': ['Drama', 'Fantasy'],
-    'reggaeton': ['Reality-TV', 'Music'],
-    'urbano latino': ['Comedy', 'Music'],
-    'trap latino': ['Crime', 'Drama'],
-    'rock': ['Adventure', 'Drama'],
-    'indie rock': ['Drama', 'Romance'],
-    'classical': ['Biography', 'History'],
-    'hip hop': ['Documentary', 'Drama'],
-    'jazz': ['Music', 'Documentary'],
-    'country': ['Drama', 'Western'],
-    'electronic': ['Sci-Fi', 'Drama'],
-    'metal': ['Thriller', 'Horror'],
-    'folk': ['Drama', 'History'],
-    'blues': ['Documentary', 'Music'],
-    'r&b': ['Drama', 'Romance'],
-    'soul': ['Biography', 'Music'],
-    'punk': ['Documentary', 'Music'],
-    'disco': ['Comedy', 'Music'],
-    'house': ['Reality-TV', 'Music'],
-    'techno': ['Documentary', 'Music'],
-    'edm': ['Reality-TV', 'Music'],
-    'latin': ['Drama', 'Romance'],
-    'reggae': ['Documentary', 'Music'],
-    'funk': ['Comedy', 'Music'],
-    'k-pop': ['Reality-TV', 'Music'],
-    'psychedelic': ['Drama', 'Fantasy'],
-    'world': ['Documentary', 'Travel'],
-    'ambient': ['Documentary', 'Sci-Fi'],
-    'lo-fi beats': ['Drama', 'Romance'],
-    'vaporwave': ['Sci-Fi', 'Drama'],
-    'emo': ['Drama', 'Music'],
-    'hardcore': ['Documentary', 'Music'],
-    'dubstep': ['Reality-TV', 'Sci-Fi'],
-    'ska': ['Comedy', 'Music'],
-    'swing': ['Musical', 'History'],
-    'trance': ['Sci-Fi', 'Drama'],
-    'grime': ['Documentary', 'Crime'],
-    'bluegrass': ['Documentary', 'Music'],
-    'new wave': ['Drama', 'Sci-Fi'],
-    'post-punk': ['Documentary', 'Music'],
-    'trip hop': ['Crime', 'Drama'],
-    'neosoul': ['Drama', 'Romance'],
-    'afrobeat': ['Documentary', 'Music'],
-    'chillhop': ['Drama', 'Animation'],
-    'synthwave': ['Sci-Fi', 'Drama'],
-    'latin viral pop': ['Reality-TV', 'Comedy'],
-    'r&b en espanol': ['Drama', 'Music']
-}
+        },
+     "Unknown": {
+        'valence': 0.5983500000000002,
+        'danceability': 0.60787,
+        'energy': 0.7006800000000003,
+        },
+     "Crime": {
+        'valence': 0.5080319999999997,
+        'danceability': 0.64384,
+        'energy': 0.6495099999999999,
+        },
+     "Fantasy": {
+        'valence': 0.307479,
+        'danceability': 0.45702000000000015,
+        'energy': 0.4734160000000001,
+        }
+    }
+
+#Function to pick movie with all genres
+def same_genres(genre_choices, genre_csv):
+    for x in range(len(genre_csv)):
+        for y in genre_choices:
+            if y not in genre_csv[x]:
+                return False
+    return True
 
 def generate_dalle_image(prompt):
     headers = {
@@ -220,45 +189,70 @@ def recommendation():
     if not token:
         return redirect(url_for('login'))
 
-    #sp = spotipy.Spotify(auth=token)
+    #User picks which media they want and we find the reccomended movie
     if request.method == 'POST':
-        #Obtains the user choice from the post request
         choice = request.form.get('choice')
-        if choice == "movie":
-            genre_mapping = movie_genre_mapping
-        elif choice == "tvshow":
-            genre_mapping = tvshow_genre_mapping
-        selection_of_genres = []
-        #Goes through the user's top genres
-        for spotify_genre in top_5_genres:
-            #Splits up the string into individual words
-            spotify_genre = spotify_genre.split()
-            for word in spotify_genre:  
-                #checks to see if one of the words in the genre string is in our dictionary
-                if word in genre_mapping:
-                    for corresponding_genre in genre_mapping[word]:
-                         #Goes through the list in the corresponding dictionary key
-                        if corresponding_genre not in selection_of_genres:
-                            selection_of_genres.append(corresponding_genre)
+        print("choice", choice) 
+        #Getting the avergage metrics for the user
+        user_metrics = {"valence": 0, "danceability": 0, "energy": 0, "tempo": 0}
+        count = 0
+        tracks = sp.current_user_top_tracks(time_range='short_term', limit=30)['items']
+        for track in tracks:
+            song_id = track['id']
+            song_metrics = sp.audio_features(song_id)[0]
+            if song_metrics is not None:
+                user_metrics["valence"] += song_metrics['valence']
+                user_metrics["danceability"] += song_metrics['danceability']
+                user_metrics["energy"] += song_metrics['energy']
+                count += 1
+        if count > 0:
+            user_metrics["valence"] = user_metrics["valence"] / count
+            user_metrics["danceability"] = user_metrics["danceability"] / count
+            user_metrics["energy"] = user_metrics["energy"] / count
 
-        #If no genre was found, it picks a random one
-        if len(selection_of_genres) > 0:
-            genre_choice = random.choice(selection_of_genres)
-        else:
-            genre_choice = random.choice(list(genre_mapping.values()))
+    #Now finds which genre is closest to the users metrics 
+        genre_td = genre_mapping
+        Genre_choice = []
+        best_genre = None
+        best_diff = float('inf')
+        for genre, genre_metrics in genre_mapping.items():
+            valence_diff = abs(user_metrics["valence"] - genre_metrics["valence"])
+            danceability_diff = abs(user_metrics["danceability"] - genre_metrics["danceability"])
+            energy_diff = abs(user_metrics["energy"] - genre_metrics["energy"])
+            
+            total_diff = valence_diff + danceability_diff + energy_diff
+            genre_td[genre] = total_diff
+
+            if total_diff <= best_diff:
+                print("total_diff: ", total_diff)
+                best_genre = genre
+                best_diff = total_diff    
+                
+        if best_genre not in Genre_choice:
+            Genre_choice.append(best_genre)
+
+        print(genre_td)
+        for genre in genre_td:
+            if abs(genre_td[genre] - best_diff) <= 0.03:
+                if genre not in Genre_choice:
+                    Genre_choice.append(genre)
+                            
+        print("Final Genre Choice:")
+        df = pd.read_csv('entertainment.csv')
         if choice == "movie":
-            df = pd.read_csv('combined_movies.csv') 
-            #filters CSV files by genre and movies with a value in genre
-            df_filtered = df[df['genres'].notna() & df['genres'].str.contains(genre_choice)]
+            df_filtered = df[df['genres'].notna() & (df['media'] == "movie") & (same_genres(Genre_choice, df['genres']))]
+            if len(df_filtered) == 0:
+                df_filtered = df[df['genres'].notna() & (df['media'] == "movie") & df['genres'].str.contains(Genre_choice[0])]
             recommended_movie = df_filtered.sample().iloc[0]
-            return render_template('displayrecommendation.html', recommended_movie=recommended_movie, choice=choice, genre_choice=genre_choice)
-        # # TV Show Filtering
+            return render_template('displayrecommendation.html', recommended_movie=recommended_movie, choice=choice, genre_choice=Genre_choice[0])
         elif choice == "tvshow":
-            df = pd.read_csv('tvshowdata.csv') 
-            df_filtered = df[(df['rating'] >= 7.0) & df['genre'].str.contains(genre_choice)]
+            df_filtered = df[df['genres'].notna() & (df['media'] == "tv") & same_genres(Genre_choice, df['genres'])]
+            if len(df_filtered) == 0:
+                df_filtered = df[df['genres'].notna() & (df['media'] == "tv") & df['genres'].str.contains(Genre_choice[0])]
             recommended_show = df_filtered.sample().iloc[0]
             return render_template('displayrecommendation.html', recommended_show=recommended_show, choice=choice)
-        
+    
+    return render_template('displayrecommendation.html', choice=choice)
 def generate_image():
     title = request.form.get('title')
     year = request.form.get('year')
@@ -271,6 +265,7 @@ def generate_image():
         return render_template('displayrecommendation.html', image_data=image_data)
     else:
         return render_template('displayrecommendation.html')
+    
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

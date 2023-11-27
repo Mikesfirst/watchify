@@ -164,9 +164,9 @@
       <h2>Recommended Movie: {{ recommended_movie['title'] }}</h2>
       <!-- Display movie details -->
       <p>Year: {{ recommended_movie['release_year'] }}</p>
-      <p>Genre: {{ recommended_movie['genre'] }}</p>
-      <p>Rating: {{ recommended_movie['rating'] }}</p>
-      <p>Description: {{ recommended_movie['description'] }}</p>
+      <p>Genre: {{ recommended_movie['genres'] }}</p>
+      <p>Rating: {{ recommended_movie['vote_average'] }}</p>
+      <p>Description: {{ recommended_movie['overview'] }}</p>
       <!-- Placeholder for DALL-E generated image -->
       <div id="dalle-image-container">
         <img src="{{ url_for_image }}" alt="Generated Image" id="generated-image">
@@ -175,9 +175,9 @@
       <h2>Recommended TV Show: {{ recommended_show['title'] }}</h2>
       <!-- Display TV show details -->
       <p>Year: {{ recommended_show['year'] }}</p>
-      <p>Genre: {{ recommended_show['genre'] }}</p>
-      <p>Rating: {{ recommended_show['rating'] }}</p>
-      <p>Description: {{ recommended_show['description'] }}</p>
+      <p>Genre: {{ recommended_show['genres'] }}</p>
+      <p>Rating: {{ recommended_show['vote_average'] }}</p>
+      <p>Description: {{ recommended_show['overview'] }}</p>
       <!-- Placeholder for DALL-E generated image -->
       <div id="dalle-image-container">
         <img src="{{ url_for_image }}" alt="Generated Image" id="generated-image">
