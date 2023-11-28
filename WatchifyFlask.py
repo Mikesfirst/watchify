@@ -233,21 +233,28 @@ def recommendation():
 
         print(genre_td)
         for genre in genre_td:
-            if abs(genre_td[genre] - best_diff) <= 0.03:
+            if abs(genre_td[genre] - best_diff) <= 0.09:
                 if genre not in Genre_choice:
                     Genre_choice.append(genre)
                             
-        print("Final Genre Choice:")
+        print("Final Genre Choice:", Genre_choice)
         df = pd.read_csv('entertainment.csv')
+        df_filtered = ""
         if choice == "movie":
-            df_filtered = df[df['genres'].notna() & (df['media'] == "movie") & (same_genres(Genre_choice, df['genres']))]
-            if len(df_filtered) == 0:
+            if len(Genre_choice) > 1:
+                df_filtered = df[df['genres'].notna() & (df['media'] == "movie")]
+                for gen in Genre_choice:
+                    df_filtered = df_filtered[(df_filtered['genres'].str.contains(gen))]
+            if len(df_filtered) == 0 or len(Genre_choice) == 1:
                 df_filtered = df[df['genres'].notna() & (df['media'] == "movie") & df['genres'].str.contains(Genre_choice[0])]
             recommended_movie = df_filtered.sample().iloc[0]
             return render_template('displayrecommendation.html', recommended_movie=recommended_movie, choice=choice, genre_choice=Genre_choice[0])
         elif choice == "tvshow":
-            df_filtered = df[df['genres'].notna() & (df['media'] == "tv") & same_genres(Genre_choice, df['genres'])]
-            if len(df_filtered) == 0:
+            if len(Genre_choice) > 1:
+                df_filtered = df[df['genres'].notna() & (df['media'] == "tv")]
+                for gen in Genre_choice:
+                    df_filtered = df_filtered[(df_filtered['genres'].str.contains(gen))]
+            if len(df_filtered) == 0 or len(Genre_choice) == 1:
                 df_filtered = df[df['genres'].notna() & (df['media'] == "tv") & df['genres'].str.contains(Genre_choice[0])]
             recommended_show = df_filtered.sample().iloc[0]
             return render_template('displayrecommendation.html', recommended_show=recommended_show, choice=choice)
