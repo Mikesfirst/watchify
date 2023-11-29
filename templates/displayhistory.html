@@ -117,8 +117,8 @@
   <main class="container">
     <div class="genre-image">
       <!-- Replace with your image paths -->
-      <img src="{{ url_for('static', filename='images/spotifylogo2.png') }}" alt="Spotify Logo" class="spotify-logo">
-      <img src="{{ url_for('static', filename='images/sunglasses.png') }}" alt="Sunglasses" class="sunglasses">
+      <img src="{{ url_for('static', filename='spotifylogo2.png') }}" alt="Spotify Logo" class="spotify-logo">
+      <img src="{{ url_for('static', filename='sunglasses.png') }}" alt="Sunglasses" class="sunglasses">
       <!-- Flask template code to loop through the genres and create labels -->
       {% for genre in top_5_genres %}
         <span class="genre-label genre-{{ loop.index }}">{{ genre }}</span>
