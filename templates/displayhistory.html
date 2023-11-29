@@ -125,6 +125,7 @@
   <main class="container">
     <div class="genre-image">
       <img src="{{ url_for('static', filename='spotifylogo2.png') }}" alt="Spotify Logo" class="spotify-logo">
+      <img src="{{ url_for('static', filename='sunglasses.png') }}" alt="Sunglasses" class="sunglasses">
       {% for genre in top_5_genres %}
         <div class="genre-label genre-{{ loop.index }}">{{ genre }}</div>
       {% endfor %}
