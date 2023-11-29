@@ -156,12 +156,15 @@ def login():
 
 @app.route('/callback')
 def callback():
+    print("We're going !")
     code = request.args['code']
-    token = sp_oauth.get_access_token(code, as_dict=False)
+    print("Code: ", code)
+    token = sp_oauth.get_access_token(code, check_cache=False, as_dict=False)
     session['token'] = token
     global sp
     sp = spotipy.Spotify(auth=token)
     print(sp.current_user())
+    print("TOP TRACKS: ", sp.current_user_top_tracks(limit=50, time_range='short_term'))
     return redirect(url_for('display_history'))
 
 @app.route('/history')
