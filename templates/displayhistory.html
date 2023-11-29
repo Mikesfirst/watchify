@@ -51,22 +51,30 @@
     
     .genre-label {
       position: absolute;
-      color:white; /* Black color for the genre labels */
-      font-size: 2vw; /* Responsive font size */
+      color: white; /* Text color */
+      font-size: 1.5em; /* Adjust the font size as needed */
       font-weight: bold;
-      white-space: nowrap;
-      transform: translate(-50%, -50%); /* Center the label */
-      background-color: rgba(255, 255, 255, 0.7); /* Light background to make text readable */
       padding: 0.5em;
       border-radius: 10px;
+      background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background for readability */
+      transform: translate(-50%, -50%);
+      text-align: center;
     }
 
-    /* Adjust the label positioning */
+    /* Positioning the labels according to the design */
     .genre-1 { top: 10%; left: 50%; }
-    .genre-2 { top: 30%; left: 18%; }
-    .genre-3 { top: 30%; right: 18%; }
-    .genre-4 { top: 50%; left: 50%; }
-    .genre-5 { bottom: 18%; left: 50%; }
+    .genre-2 { top: 30%; left: 15%; }
+    .genre-3 { top: 30%; right: 15%; }
+    .genre-4 { bottom: 30%; left: 15%; }
+    .genre-5 { bottom: 30%; right: 15%; }
+
+    /* Ensure the text fits even if it's long */
+    .genre-label {
+      max-width: 120px; /* Maximum width of the genre label */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
     footer {
       margin-top: 20px;
@@ -121,18 +129,18 @@
   <main class="container">
     <div class="genre-image">
       <!-- Replace with your image paths -->
-      <img src="{{ url_for('static', filename='spotifylogo2.png') }}" alt="Spotify Logo" class="spotify-logo">
-      <img src="{{ url_for('static', filename='sunglasses.png') }}" alt="Sunglasses" class="sunglasses">
-      <!-- This part should be replaced with your server-side code to generate genre labels -->
+      <img src="{{ url_for('static', filename='images/spotifylogo2.png') }}" alt="Spotify Logo" class="spotify-logo">
+      <img src="{{ url_for('static', filename='images/sunglasses.png') }}" alt="Sunglasses" class="sunglasses">
+      <!-- Flask template code to loop through the genres and create labels -->
       {% for genre in top_5_genres %}
-        <div class="genre-label genre-{{ loop.index }}">{{ genre }}</div>
+        <span class="genre-label genre-{{ loop.index }}">{{ genre }}</span>
       {% endfor %}
-    </div>
     </div>
     <footer>
       <button id="download-btn" class="btn-custom">Download Your Journey</button>
       <a href="{{ url_for('recommendation') }}" class="btn-custom">Proceed to Recommendations</a>
     </footer>    
   </main>
+
 
   
