@@ -178,7 +178,7 @@ def callback():
 def display_history():
     # Fetch user's top tracks from the past 30 days (short term)
     top_tracks = sp.current_user_top_tracks(limit=50, time_range='short_term')
-    artist_ids = [track['album']['artists'][0]['id'] for track in top_tracks['items']]
+    artist_ids = [track['album']['artists'][0]['id'] for track in top_tracks['items']] 
     artists = sp.artists(artist_ids)['artists']
     for artist in artists:
         for genre in artist['genres']:
