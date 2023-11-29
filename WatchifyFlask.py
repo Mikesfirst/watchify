@@ -20,7 +20,7 @@ recommended_movie = []
 
 # Spotify API Credentials
 SPOTIPY_CLIENT_ID = '55118ada9eb54f9aa5633d24c6e5e0cf'
-SPOTIPY_CLIENT_SECRET = '012b2b6b819a43d895e2b48e59b62d64'
+SPOTIPY_CLIENT_SECRET = '6fe22f2ca5864f6b88a9477de0df7a6f'
 SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
 
 #Michael's ID just to run locally
