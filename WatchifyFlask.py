@@ -19,15 +19,14 @@ recommended_tvshow = []
 recommended_movie = []
 
 # Spotify API Credentials
-#SPOTIPY_CLIENT_ID = '55118ada9eb54f9aa5633d24c6e5e0cf'
-#SPOTIPY_CLIENT_SECRET = '012b2b6b819a43d895e2b48e59b62d64'
-#SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
- #SPOTIPY_REDIRECT_URI = 'https://shamp00the-cat.github.io/movierecs/callback'
+SPOTIPY_CLIENT_ID = '55118ada9eb54f9aa5633d24c6e5e0cf'
+SPOTIPY_CLIENT_SECRET = '012b2b6b819a43d895e2b48e59b62d64'
+SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
 
 #Michael's ID just to run locally
-SPOTIPY_CLIENT_ID = "6f8bacd4931e41839442e43813d4fcfb"
-SPOTIPY_CLIENT_SECRET = "bd500cdc7b674c3087c2eadbdb0ec058" 
-SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
+# SPOTIPY_CLIENT_ID = "6f8bacd4931e41839442e43813d4fcfb"
+# SPOTIPY_CLIENT_SECRET = "bd500cdc7b674c3087c2eadbdb0ec058" 
+# SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
 
 sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
                         client_secret=SPOTIPY_CLIENT_SECRET,
@@ -162,6 +161,7 @@ def callback():
     session['token'] = token
     global sp
     sp = spotipy.Spotify(auth=token)
+    print(sp.current_user())
     return redirect(url_for('display_history'))
 
 @app.route('/history')
