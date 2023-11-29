@@ -201,6 +201,7 @@ def recommendation():
 
     #User picks which media they want and we find the reccomended movie
     if request.method == 'POST':
+
         choice = request.form.get('choice')
         print("choice", choice) 
         #Getting the avergage metrics for the user
@@ -221,7 +222,21 @@ def recommendation():
             user_metrics["energy"] = user_metrics["energy"] / count
 
     #Now finds which genre is closest to the users metrics 
-        genre_td = genre_mapping
+        genre_td = {
+    "Romance": {},
+    "Action": {},
+    "Comedy": {},
+    "Science Fiction": {},
+    "Horror": {},
+    "Family": {},
+    "Drama": {},
+    "Adventure": {},
+    "Thriller": {},
+    "Unknown": {},
+    "Crime": {},
+    "Fantasy": {}
+}
+
         Genre_choice = []
         best_genre = None
         best_diff = float('inf')
