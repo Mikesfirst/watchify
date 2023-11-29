@@ -51,30 +51,18 @@
     
     .genre-label {
       position: absolute;
-      color: white; /* Text color */
-      font-size: 1.5em; /* Adjust the font size as needed */
+      color: black; /* Change text color to black */
+      font-size: 1em; /* Adjust the font size as needed */
       font-weight: bold;
-      padding: 0.5em;
-      border-radius: 10px;
-      background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent black background for readability */
-      transform: translate(-50%, -50%);
-      text-align: center;
+      /* Remove background and padding */
+      /* Adjust the position offsets to match the wireframe */
     }
 
-    /* Positioning the labels according to the design */
-    .genre-1 { top: 10%; left: 50%; }
-    .genre-2 { top: 30%; left: 15%; }
-    .genre-3 { top: 30%; right: 15%; }
-    .genre-4 { bottom: 30%; left: 15%; }
-    .genre-5 { bottom: 30%; right: 15%; }
-
-    /* Ensure the text fits even if it's long */
-    .genre-label {
-      max-width: 120px; /* Maximum width of the genre label */
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    .genre-1 { top: 10%; left: 10%; }
+    .genre-2 { top: 10%; right: 10%; }
+    .genre-3 { bottom: 30%; left: 10%; }
+    .genre-4 { bottom: 30%; right: 10%; }
+    .genre-5 { bottom: 50%; left: 50%; transform: translateX(-50%); } /* Center horizontally */
 
     footer {
       margin-top: 20px;
