@@ -38,22 +38,22 @@ DALL_E_API_ENDPOINT = "https://api.openai.com/v1/images/generations"
 DALL_E_API_KEY = "YOUR_API_KEY"
 
 # DB Configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@YOUR_RDS_ENDPOINT:5432/watchify' # change
-db = SQLAlchemy(app)
-class Recommendation(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    spotify_genres = db.Column(db.String)
-    recommendation_type = db.Column(db.String)
-    title = db.Column(db.String)
-    genre = db.Column(db.String)
-    rating = db.Column(db.Float)
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@YOUR_RDS_ENDPOINT:5432/watchify' # change
+db = SQLAlchemy()
+#class Recommendation(db.Model):
+   # id = db.Column(db.Integer, primary_key=True)
+   # spotify_genres = db.Column(db.String)
+   # recommendation_type = db.Column(db.String)
+   # title = db.Column(db.String)
+   # genre = db.Column(db.String)
+   # rating = db.Column(db.Float)
     
-    def __init__(self, spotify_genres, recommendation_type, title, genre, rating):
-        self.spotify_genres = spotify_genres
-        self.recommendation_type = recommendation_type
-        self.title = title
-        self.genre = genre
-        self.rating = rating
+    #def __init__(self, spotify_genres, recommendation_type, title, genre, rating):
+     #   self.spotify_genres = spotify_genres
+      #  self.recommendation_type = recommendation_type
+       # self.title = title
+        #self.genre = genre
+       # self.rating = rating
 
 #Genre Mapping
 genre_mapping = {
@@ -222,6 +222,8 @@ def recommendation():
             user_metrics["energy"] = user_metrics["energy"] / count
 
     #Now finds which genre is closest to the users metrics 
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
         genre_td = {
     "Romance": {},
     "Action": {},
@@ -237,6 +239,12 @@ def recommendation():
     "Fantasy": {}
 }
 
+=======
+        genre_td = genre_mapping.copy()
+>>>>>>> Stashed changes
+=======
+        genre_td = genre_mapping.copy()
+>>>>>>> Stashed changes
         Genre_choice = []
         best_genre = None
         best_diff = float('inf')

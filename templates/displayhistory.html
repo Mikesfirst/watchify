@@ -118,6 +118,8 @@
     <h2>Visualize Your 30-Day Spotify Listening History</h2>
     <p class="paragraph">Immerse yourself in the visual representation of your Spotify listening history over the last month.</p>
   </header>
+<<<<<<< Updated upstream
+<<<<<<< Updated upstream
   <main class="container">
     <div class="genre-image">
       <!-- Replace with your image paths -->
@@ -125,6 +127,23 @@
       <img src="{{ url_for('static', filename='sunglasses.png') }}" alt="Sunglasses" class="sunglasses">
       <!-- This part should be replaced with your server-side code to generate genre labels -->
       {% for genre in top_5_genres %}
+=======
+=======
+>>>>>>> Stashed changes
+      <main class="container">
+        <div class="genre-image">
+          <img src="{{ url_for('static', filename='spotifylogo2.png') }}" alt="Spotify Logo" class="spotify-logo">
+          <img src="{{ url_for('static', filename='sunglasses.png') }}" alt="Sunglasses" class="sunglasses">
+          <div class="genre-label genre-1">{{ top_5_genres[0] }}</div>
+          <div class="genre-label genre-2">{{ top_5_genres[1] }}</div>
+          <div class="genre-label genre-3">{{ top_5_genres[2] }}</div>
+          <div class="genre-label genre-4">{{ top_5_genres[3] }}</div>
+          <div class="genre-label genre-5">{{ top_5_genres[4] }}</div>
+        </div>
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
         <div class="genre-label genre-{{ loop.index }}">{{ genre }}</div>
       {% endfor %}
     </div>
