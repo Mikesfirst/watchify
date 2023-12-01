@@ -1,0 +1,134 @@
+<!-- Page 3: Top 5 Genres Over Past 30 Days -->
+<!-- https://shamp00the-cat.github.io/movierecs/-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Watchify: Your Musical Journey</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Spotify Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- Custom CSS -->
+  <style>
+    body, h1, h2, li {
+      font-family: 'Montserrat', sans-serif;
+    }
+    body {
+      text-align: center; /* Center text globally */
+      background: #fff; /* White background */
+      color: #000; /* Black text color */
+    }
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Center content vertically in main */
+      margin-top: 20px;
+    }
+ 
+    .spotify-logo {
+      max-width: 50px; /* Adjust the size as necessary, keeping it responsive */
+      width: 20%; /* Width as a percentage of its parent */
+      height: auto;
+    }
+
+    .genre-image {
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      width: 100%;
+      max-width: 500px; /* Max width for the sunglasses image */
+      height: auto; /* Adjusted to maintain aspect ratio */
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .genre-label {
+      position: absolute;
+      color: black; /* Change text color to black */
+      font-size: 1em; /* Adjust the font size as needed */
+      font-weight: bold;
+      /* Remove background and padding */
+      /* Adjust the position offsets to match the wireframe */
+    }
+
+    .genre-1 { top: 10%; left: 10%; }
+    .genre-2 { top: 10%; right: 10%; }
+    .genre-3 { bottom: 30%; left: 10%; }
+    .genre-4 { bottom: 30%; right: 10%; }
+    .genre-5 { bottom: 50%; left: 50%; transform: translateX(-50%); } /* Center horizontally */
+
+    footer {
+      margin-top: 20px;
+      padding-bottom: 40px; /* Adds space between the button and the end of the page */
+    }
+
+    footer a, .btn-custom {
+      background-color: #1DB954; /* Spotify green color */
+      color: white;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: bold;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 20px; /* Rounded corners for the button */
+      width: fit-content;
+      margin: 0 auto; /* Center the button */
+    }
+
+    .btn-custom {
+      border: none; /* No border for the button */
+      display: inline-block; /* Display as inline-block for side-by-side */
+      margin: 5px; /* Margin for spacing */
+      cursor: pointer; /* Cursor to pointer */
+    }
+
+    /* Removes the focus outline from both the link and the button for aesthetic consistency */
+    footer a:focus, .btn-custom:focus {
+      outline: none;
+    }
+
+    header h2 {
+      margin-bottom: 0; /* Removes bottom margin from the h2 */
+      margin-top: 30px;
+    }
+
+    .paragraph {
+      margin-top: 20px; /* Adds a small space above the paragraph */
+      font-size: 20px;
+      max-width: 80%;
+      margin-left: auto; /* Centers the paragraph */
+      margin-right: auto;
+      margin-top: 50px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Your Musical Journey</h1>
+    <h2>Visualize Your 30-Day Spotify Listening History</h2>
+    <p class="paragraph">Immerse yourself in the visual representation of your Spotify listening history over the last month.</p>
+  </header>
+  <main class="container">
+    <div class="genre-image">
+      <!-- Replace with your image paths -->
+      <img src="{{ url_for('static', filename='spotifylogo2.png') }}" alt="Spotify Logo" class="spotify-logo">
+      <img src="{{ url_for('static', filename='sunglasses.png') }}" alt="Sunglasses" class="sunglasses">
+      <!-- Flask template code to loop through the genres and create labels -->
+      {% for genre in top_5_genres %}
+        <span class="genre-label genre-{{ loop.index }}">{{ genre }}</span>
+      {% endfor %}
+    </div>
+    <footer>
+      <button id="download-btn" class="btn-custom">Download Your Journey</button>
+      <a href="{{ url_for('recommendation') }}" class="btn-custom">Proceed to Recommendations</a>
+    </footer>    
+  </main>
+
+
+  
