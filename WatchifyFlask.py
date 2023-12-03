@@ -188,9 +188,10 @@ def display_history():
               genre_count[genre] = 1
 
     # Ensure that the genres from Spotify are in lowercase for the mapping.
+    user_name = sp.current_user()["display_name"]
     global top_5_genres 
     top_5_genres = [genre.lower() for genre in sorted(genre_count, key=genre_count.get, reverse=True)[:5]]
-    return render_template('displayhistory.html', top_5_genres=top_5_genres)
+    return render_template('displayhistory.html', top_5_genres=top_5_genres, user_name=user_name)
 
 @app.route('/recommendation', methods=['GET', 'POST'])
 def recommendation():
@@ -259,7 +260,7 @@ def recommendation():
         print(genre_td)
         for genre in genre_td:
             print("genre: ",genre," ", genre_td[genre])
-            if abs(genre_td[genre] - best_diff) <= 0.05:
+            if abs(genre_td[genre] - best_diff) <= 0.02:
                 if genre not in Genre_choice:
                     Genre_choice.append(genre)
                             
