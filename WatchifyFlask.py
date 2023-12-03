@@ -103,7 +103,7 @@ genre_mapping = {
         'energy': 0.5883509999999998,
 
         },
-     "Unknown": {
+     "Biography": {
         'valence': 0.5983500000000002,
         'danceability': 0.60787,
         'energy': 0.7006800000000003,
