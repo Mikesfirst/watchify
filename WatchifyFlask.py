@@ -222,29 +222,21 @@ def recommendation():
             user_metrics["energy"] = user_metrics["energy"] / count
 
     #Now finds which genre is closest to the users metrics 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
         genre_td = {
-    "Romance": {},
-    "Action": {},
-    "Comedy": {},
-    "Science Fiction": {},
-    "Horror": {},
-    "Family": {},
-    "Drama": {},
-    "Adventure": {},
-    "Thriller": {},
-    "Unknown": {},
-    "Crime": {},
-    "Fantasy": {}
-}
+            "Romance": {},
+            "Action": {},
+            "Comedy": {},
+            "Science Fiction": {},
+            "Horror": {},
+            "Family": {},
+            "Drama": {},
+            "Adventure": {},
+            "Thriller": {},
+            "Biography": {},
+            "Crime": {},
+            "Fantasy": {}
+    }
 
-=======
-        genre_td = genre_mapping.copy()
->>>>>>> Stashed changes
-=======
-        genre_td = genre_mapping.copy()
->>>>>>> Stashed changes
         Genre_choice = []
         best_genre = None
         best_diff = float('inf')
@@ -266,7 +258,8 @@ def recommendation():
 
         print(genre_td)
         for genre in genre_td:
-            if abs(genre_td[genre] - best_diff) <= 0.09:
+            print("genre: ",genre," ", genre_td[genre])
+            if abs(genre_td[genre] - best_diff) <= 0.05:
                 if genre not in Genre_choice:
                     Genre_choice.append(genre)
                             
@@ -278,6 +271,8 @@ def recommendation():
                 df_filtered = df[df['genres'].notna() & (df['media'] == "movie")]
                 for gen in Genre_choice:
                     df_filtered = df_filtered[(df_filtered['genres'].str.contains(gen))]
+                if len(df_filtered[df_filtered['genres'].str.count(',') + 1 == len(Genre_choice)]) > 1:
+                    df_filtered = df_filtered[df_filtered['genres'].str.count(',') + 1 == len(Genre_choice)]
             if len(df_filtered) == 0 or len(Genre_choice) == 1:
                 df_filtered = df[df['genres'].notna() & (df['media'] == "movie") & df['genres'].str.contains(Genre_choice[0])]
             recommended_movie = df_filtered.sample().iloc[0]
@@ -291,7 +286,6 @@ def recommendation():
                 df_filtered = df[df['genres'].notna() & (df['media'] == "tv") & df['genres'].str.contains(Genre_choice[0])]
             recommended_show = df_filtered.sample().iloc[0]
             return render_template('displayrecommendation.html', recommended_show=recommended_show, choice=choice)
-    
     return render_template('displayrecommendation.html', choice=choice)
 def generate_image():
     title = request.form.get('title')
