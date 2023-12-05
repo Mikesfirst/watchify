@@ -76,12 +76,12 @@
     <p>Current Spotify User: {{ username }}</p>
   </header>
   <main class="container">
-    <!-- Plot image -->
     <div class="genre-image">
-      <img src="data:image/png;base64,{{ plot_url }}" alt="Genre Audio Features" style="width: 100%; max-width: 600px; height: auto;">
+      <img src="{{ url_for('static', filename='user_plot.png') }}" alt="Genre Audio Features" style="width: 100%; max-width: 600px; height: auto;">
     </div>
     <footer>
-      <button id="download-btn" class="btn-custom">Download Your Journey</button>
+      <!-- Download link for the image -->
+      <a href="{{ url_for('static', filename='user_plot.png') }}" download="YourSpotifyJourney.png" class="btn-custom">Download Your Journey</a>
       <a href="{{ url_for('recommendation') }}" class="btn-custom">Proceed to Recommendations</a>
     </footer>    
   </main>
