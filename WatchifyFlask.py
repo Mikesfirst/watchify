@@ -236,13 +236,11 @@ def display_history():
     plt.xticks(rotation=45)
     plt.legend(title='Feature')
 
-    # Convert plot to a PNG image and encode it in base64
-    img = BytesIO()
-    plt.savefig(img, format='png', bbox_inches='tight')
-    img.seek(0)
-    plot_url = base64.b64encode(img.getvalue()).decode()
+    # Save the plot as a PNG file
+    img_path = os.path.join('static', 'user_plot.png')  # Ensure 'static' directory exists
+    plt.savefig(img_path, format='png', bbox_inches='tight')
 
-    return render_template('displayhistory.html', plot_url=plot_url, username=username)
+    return render_template('displayhistory.html', img_path=img_path, username=username)
 
 
 @app.route('/recommendation', methods=['GET', 'POST'])
