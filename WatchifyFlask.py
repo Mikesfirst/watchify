@@ -1,10 +1,13 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_bootstrap import Bootstrap
 from os import environ
+import time
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from flask_sqlalchemy import SQLAlchemy
 import pandas as pd
+import matplotlib.plotly as plt 
+import seaborn as sns
 import random
 import requests
 import json
@@ -32,10 +35,6 @@ sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
                         client_secret=SPOTIPY_CLIENT_SECRET,
                         redirect_uri=SPOTIPY_REDIRECT_URI,
                         scope=["user-top-read"])
-
-# DALL-E API endpoint and API Key (replace 'YOUR_API_KEY' with your actual API key)
-DALL_E_API_ENDPOINT = "https://api.openai.com/v1/images/generations"
-DALL_E_API_KEY = "YOUR_API_KEY"
 
 # DB Configuration
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@YOUR_RDS_ENDPOINT:5432/watchify' # change
@@ -103,7 +102,7 @@ genre_mapping = {
         'energy': 0.5883509999999998,
 
         },
-     "Unknown": {
+     "Biography": {
         'valence': 0.5983500000000002,
         'danceability': 0.60787,
         'energy': 0.7006800000000003,
@@ -128,23 +127,6 @@ def same_genres(genre_choices, genre_csv):
                 return False
     return True
 
-def generate_dalle_image(prompt):
-    headers = {
-        "Authorization": f"Bearer {DALL_E_API_KEY}",
-        "Content-Type": "application/json"
-    }
-    data = {
-        "prompt": prompt,
-        "n": 1,
-        "size": "200x200"
-    }
-    response = requests.post(DALL_E_API_ENDPOINT, headers=headers, data=json.dumps(data))
-    if response.status_code == 200:
-        image_data = response.json()['data'][0]['image']
-        return image_data
-    else:
-        return None
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -158,39 +140,108 @@ def login():
 def callback():
     code = request.args.get('code')
     if not code:
-        # Handle the case where the code is missing
         return "Error: No code provided.", 400
 
     try:
         token_info = sp_oauth.get_access_token(code, check_cache=False)
         session['token'] = token_info['access_token']
+
+        # Optionally, you can store the refresh token as well
+        # session['refresh_token'] = token_info['refresh_token']
+
     except Exception as e:
-        # Log the exception for debugging
         print(f"Error retrieving access token: {e}")
         return "Error in token retrieval.", 500
 
-    # Initialize the Spotipy client with the access token
-    global sp
-    sp = spotipy.Spotify(auth=session['token'])
+    # Redirect to another route (e.g., display history) after successful authentication
     return redirect(url_for('display_history'))
 
 @app.route('/history')
 def display_history():
-    # Fetch user's top tracks from the past 30 days (short term)
-    top_tracks = sp.current_user_top_tracks(limit=50, time_range='short_term')
-    artist_ids = [track['album']['artists'][0]['id'] for track in top_tracks['items']] 
-    artists = sp.artists(artist_ids)['artists']
-    for artist in artists:
-        for genre in artist['genres']:
-            if genre in genre_count:
-              genre_count[genre] += 1
-            else:
-              genre_count[genre] = 1
+    if 'token' not in session:
+        return redirect(url_for('login'))
 
-    # Ensure that the genres from Spotify are in lowercase for the mapping.
-    global top_5_genres 
-    top_5_genres = [genre.lower() for genre in sorted(genre_count, key=genre_count.get, reverse=True)[:5]]
-    return render_template('displayhistory.html', top_5_genres=top_5_genres)
+    sp = spotipy.Spotify(auth=session['token'])
+
+    # Fetch the current Spotify user's details
+    current_user = sp.current_user()
+    username = current_user['display_name']  # Get the username
+
+    # Fetch user's top tracks from the past 30 days (short term)
+    top_tracks = sp.current_user_top_tracks(limit=50, time_range='short_term')['items']
+
+    # Initialize genre count dictionary
+    genre_count = {}
+
+    # Loop through top tracks and count genres
+    for track in top_tracks:
+        artist_id = track['artists'][0]['id']
+        artist = sp.artist(artist_id)
+        for genre in artist['genres']:
+            genre_count[genre] = genre_count.get(genre, 0) + 1
+
+    # Find the top 5 genres
+    top_5_genres = sorted(genre_count, key=genre_count.get, reverse=True)[:5]
+
+    # Count genres and accumulate audio features for each genre
+    genre_features = {genre: {"valence": 0, "danceability": 0, "energy": 0, "tempo": 0, "count": 0} for genre in top_5_genres}
+
+    for track in top_tracks:
+        song_id = track['id']
+        song_metrics = sp.audio_features(song_id)[0]
+        if song_metrics:
+            artist_ids = [artist['id'] for artist in track['album']['artists']]
+            artists = sp.artists(artist_ids)['artists']
+            for artist in artists:
+                for genre in artist['genres']:
+                    genre_lower = genre.lower()
+                    if genre_lower in genre_features:
+                        genre_features[genre_lower]["valence"] += song_metrics['valence']
+                        genre_features[genre_lower]["danceability"] += song_metrics['danceability']
+                        genre_features[genre_lower]["energy"] += song_metrics['energy']
+                        genre_features[genre_lower]["tempo"] += song_metrics['tempo']
+                        genre_features[genre_lower]["count"] += 1
+
+    # Calculate the average of each audio feature for each genre
+    for genre, metrics in genre_features.items():
+        if metrics["count"] > 0:
+            metrics["valence"] /= metrics["count"]
+            metrics["danceability"] /= metrics["count"]
+            metrics["energy"] /= metrics["count"]
+            metrics["tempo"] /= metrics["count"]
+
+    # Prepare the data for plotting
+    data = {'Genre': [], 'Valence': [], 'Danceability': [], 'Energy': [], 'Count': []}
+    for genre, metrics in genre_features.items():
+        data['Genre'].append(genre.capitalize())
+        data['Valence'].append(metrics['valence'])
+        data['Danceability'].append(metrics['danceability'])
+        data['Energy'].append(metrics['energy'])
+        data['Count'].append(metrics['count'])
+
+    df = pd.DataFrame(data)
+
+    # Melting the DataFrame for better visualization
+    melted_df = df.melt(id_vars=['Genre', 'Count'], value_vars=['Valence', 'Danceability', 'Energy'],
+                        var_name='Feature', value_name='Average')
+
+    # Plotting the graph
+    plt.figure(figsize=(16, 9))
+    barplot = sns.barplot(x='Genre', y='Average', hue='Feature', data=melted_df, palette=['#1db954', '#191414', '#ababab'])
+
+    # Customize the plot
+    plt.title('Spotify Top 5 Genres and Audio Features (Last 30 Days)', fontsize=16)
+    plt.ylabel('Average Feature Value', fontsize=12)
+    plt.xlabel('Genre', fontsize=12)
+    plt.xticks(rotation=45)
+    plt.legend(title='Feature')
+
+    # Save the plot as a PNG file
+    img_path = os.path.join('static', 'user_plot.png')  # Ensure 'static' directory exists
+    plt.savefig(img_path, format='png', bbox_inches='tight')
+
+    return render_template('displayhistory.html', img_path=img_path, username=username)
+
 
 @app.route('/recommendation', methods=['GET', 'POST'])
 def recommendation():
@@ -222,29 +273,21 @@ def recommendation():
             user_metrics["energy"] = user_metrics["energy"] / count
 
     #Now finds which genre is closest to the users metrics 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
         genre_td = {
-    "Romance": {},
-    "Action": {},
-    "Comedy": {},
-    "Science Fiction": {},
-    "Horror": {},
-    "Family": {},
-    "Drama": {},
-    "Adventure": {},
-    "Thriller": {},
-    "Unknown": {},
-    "Crime": {},
-    "Fantasy": {}
-}
+            "Romance": {},
+            "Action": {},
+            "Comedy": {},
+            "Science Fiction": {},
+            "Horror": {},
+            "Family": {},
+            "Drama": {},
+            "Adventure": {},
+            "Thriller": {},
+            "Biography": {},
+            "Crime": {},
+            "Fantasy": {}
+    }
 
-=======
-        genre_td = genre_mapping.copy()
->>>>>>> Stashed changes
-=======
-        genre_td = genre_mapping.copy()
->>>>>>> Stashed changes
         Genre_choice = []
         best_genre = None
         best_diff = float('inf')
@@ -266,7 +309,8 @@ def recommendation():
 
         print(genre_td)
         for genre in genre_td:
-            if abs(genre_td[genre] - best_diff) <= 0.09:
+            print("genre: ",genre," ", genre_td[genre])
+            if abs(genre_td[genre] - best_diff) <= 0.02:
                 if genre not in Genre_choice:
                     Genre_choice.append(genre)
                             
@@ -278,6 +322,8 @@ def recommendation():
                 df_filtered = df[df['genres'].notna() & (df['media'] == "movie")]
                 for gen in Genre_choice:
                     df_filtered = df_filtered[(df_filtered['genres'].str.contains(gen))]
+                if len(df_filtered[df_filtered['genres'].str.count(',') + 1 == len(Genre_choice)]) > 1:
+                    df_filtered = df_filtered[df_filtered['genres'].str.count(',') + 1 == len(Genre_choice)]
             if len(df_filtered) == 0 or len(Genre_choice) == 1:
                 df_filtered = df[df['genres'].notna() & (df['media'] == "movie") & df['genres'].str.contains(Genre_choice[0])]
             recommended_movie = df_filtered.sample().iloc[0]
@@ -291,20 +337,7 @@ def recommendation():
                 df_filtered = df[df['genres'].notna() & (df['media'] == "tv") & df['genres'].str.contains(Genre_choice[0])]
             recommended_show = df_filtered.sample().iloc[0]
             return render_template('displayrecommendation.html', recommended_show=recommended_show, choice=choice)
-    
     return render_template('displayrecommendation.html', choice=choice)
-def generate_image():
-    title = request.form.get('title')
-    year = request.form.get('year')
-    genre = request.form.get('genre')
-    rating = request.form.get('rating')
-    description = request.form.get('description')
-    prompt = f"{title}, released in {year}, is a {genre} with a rating of {rating}/10. {description}"
-    image_data = generate_dalle_image(prompt)
-    if image_data:
-        return render_template('displayrecommendation.html', image_data=image_data)
-    else:
-        return render_template('displayrecommendation.html')
     
 
 if __name__ == '__main__':
