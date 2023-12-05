@@ -134,7 +134,6 @@ def login():
     return render_template('loginpage.html', auth_url=auth_url)
 
 @app.route('/callback')
-@app.route('/callback')
 def callback():
     code = request.args.get('code')
     if not code:
@@ -156,22 +155,92 @@ def callback():
 
 @app.route('/history')
 def display_history():
-    # Fetch user's top tracks from the past 30 days (short term)
-    top_tracks = sp.current_user_top_tracks(limit=50, time_range='short_term')
-    artist_ids = [track['album']['artists'][0]['id'] for track in top_tracks['items']] 
-    artists = sp.artists(artist_ids)['artists']
-    for artist in artists:
-        for genre in artist['genres']:
-            if genre in genre_count:
-              genre_count[genre] += 1
-            else:
-              genre_count[genre] = 1
+    if 'token' not in session:
+        return redirect(url_for('login'))
 
-    # Ensure that the genres from Spotify are in lowercase for the mapping.
-    user_name = sp.current_user()["display_name"]
-    global top_5_genres 
-    top_5_genres = [genre.lower() for genre in sorted(genre_count, key=genre_count.get, reverse=True)[:5]]
-    return render_template('displayhistory.html', top_5_genres=top_5_genres, user_name=user_name)
+    sp = spotipy.Spotify(auth=session['token'])
+
+    # Fetch the current Spotify user's details
+    current_user = sp.current_user()
+    username = current_user['display_name']  # Get the username
+
+    # Fetch user's top tracks from the past 30 days (short term)
+    top_tracks = sp.current_user_top_tracks(limit=50, time_range='short_term')['items']
+
+    # Initialize genre count dictionary
+    genre_count = {}
+
+    # Loop through top tracks and count genres
+    for track in top_tracks:
+        artist_id = track['artists'][0]['id']
+        artist = sp.artist(artist_id)
+        for genre in artist['genres']:
+            genre_count[genre] = genre_count.get(genre, 0) + 1
+
+    # Find the top 5 genres
+    top_5_genres = sorted(genre_count, key=genre_count.get, reverse=True)[:5]
+
+    # Count genres and accumulate audio features for each genre
+    genre_features = {genre: {"valence": 0, "danceability": 0, "energy": 0, "tempo": 0, "count": 0} for genre in top_5_genres}
+
+    for track in top_tracks:
+        song_id = track['id']
+        song_metrics = sp.audio_features(song_id)[0]
+        if song_metrics:
+            artist_ids = [artist['id'] for artist in track['album']['artists']]
+            artists = sp.artists(artist_ids)['artists']
+            for artist in artists:
+                for genre in artist['genres']:
+                    genre_lower = genre.lower()
+                    if genre_lower in genre_features:
+                        genre_features[genre_lower]["valence"] += song_metrics['valence']
+                        genre_features[genre_lower]["danceability"] += song_metrics['danceability']
+                        genre_features[genre_lower]["energy"] += song_metrics['energy']
+                        genre_features[genre_lower]["tempo"] += song_metrics['tempo']
+                        genre_features[genre_lower]["count"] += 1
+
+    # Calculate the average of each audio feature for each genre
+    for genre, metrics in genre_features.items():
+        if metrics["count"] > 0:
+            metrics["valence"] /= metrics["count"]
+            metrics["danceability"] /= metrics["count"]
+            metrics["energy"] /= metrics["count"]
+            metrics["tempo"] /= metrics["count"]
+
+    # Prepare the data for plotting
+    data = {'Genre': [], 'Valence': [], 'Danceability': [], 'Energy': [], 'Count': []}
+    for genre, metrics in genre_features.items():
+        data['Genre'].append(genre.capitalize())
+        data['Valence'].append(metrics['valence'])
+        data['Danceability'].append(metrics['danceability'])
+        data['Energy'].append(metrics['energy'])
+        data['Count'].append(metrics['count'])
+
+    df = pd.DataFrame(data)
+
+    # Melting the DataFrame for better visualization
+    melted_df = df.melt(id_vars=['Genre', 'Count'], value_vars=['Valence', 'Danceability', 'Energy'],
+                        var_name='Feature', value_name='Average')
+
+    # Plotting the graph
+    plt.figure(figsize=(16, 9))
+    barplot = sns.barplot(x='Genre', y='Average', hue='Feature', data=melted_df, palette=['#1db954', '#191414', '#ababab'])
+
+    # Customize the plot
+    plt.title('Spotify Top 5 Genres and Audio Features (Last 30 Days)', fontsize=16)
+    plt.ylabel('Average Feature Value', fontsize=12)
+    plt.xlabel('Genre', fontsize=12)
+    plt.xticks(rotation=45)
+    plt.legend(title='Feature')
+
+    # Convert plot to a PNG image and encode it in base64
+    img = BytesIO()
+    plt.savefig(img, format='png', bbox_inches='tight')
+    img.seek(0)
+    plot_url = base64.b64encode(img.getvalue()).decode()
+
+    return render_template('displayhistory.html', plot_url=plot_url, username=username)
+
 
 @app.route('/recommendation', methods=['GET', 'POST'])
 def recommendation():
