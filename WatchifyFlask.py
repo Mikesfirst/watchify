@@ -199,17 +199,14 @@ def login():
 @app.route('/callback')
 def callback():
     code = request.args.get('code')
-    if not code:
-        return "Error: No code provided.", 400
+    token = sp_oauth.get_access_token(code, check_cache=False, SameSite=Lax)
+    session['token'] = token['access_token']
 
-    try:
-        token_info = sp_oauth.get_access_token(code, check_cache=False)
-        session['token'] = token_info['access_token']
-        return redirect(url_for('display_history'))
-    
-    except Exception as e:
-        print(f"Error retrieving access token: {e}")
-        return "Error in token retrieval.", 500
+    global sp
+    sp = spotipy.Spotify(auth=token)
+    print(sp.current_user())
+    print("TOP TRACKS: ", sp.current_user_top_tracks(limit=50, time_range='short_term'))
+    return redirect(url_for('display_history'))
 
 @app.route('/history')
 def display_history():
