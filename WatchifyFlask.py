@@ -199,7 +199,7 @@ def login():
 @app.route('/callback')
 def callback():
     code = request.args.get('code')
-    token = sp_oauth.get_access_token(code, check_cache=False, SameSite=Lax)
+    token = sp_oauth.get_access_token(code, check_cache=False)
     session['token'] = token['access_token']
 
     global sp
