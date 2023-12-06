@@ -92,18 +92,6 @@
       overflow: auto;
     }
 
-    #dalle-image-container {
-      text-align: center; /* Center the image container */
-      margin-top: 20px; /* Add space above the container */
-    }
-
-    #generated-image {
-      width: 200px; /* Set the width of the image */
-      height: 200px; /* Set the height of the image */
-      object-fit: cover; /* Ensure the image covers the area without stretching */
-      border: 1px solid #000; /* Optional: adds a border around the image */
-    }
-
     .details {
       text-align: left;
       padding-left: 40px;
@@ -167,10 +155,6 @@
       <p>Genre: {{ recommended_movie['genres'] }}</p>
       <p>Rating: {{ recommended_movie['vote_average'] }}</p>
       <p>Description: {{ recommended_movie['overview'] }}</p>
-      <!-- Placeholder for DALL-E generated image -->
-      <div id="dalle-image-container">
-        <img src="{{ url_for_image }}" alt="Generated Image" id="generated-image">
-      </div>
     {% elif choice == "tvshow" %}
       <h2>Recommended TV Show: {{ recommended_show['title'] }}</h2>
       <!-- Display TV show details -->
@@ -178,9 +162,6 @@
       <p>Genre: {{ recommended_show['genres'] }}</p>
       <p>Rating: {{ recommended_show['vote_average'] }}</p>
       <p>Description: {{ recommended_show['overview'] }}</p>
-      <!-- Placeholder for DALL-E generated image -->
-      <div id="dalle-image-container">
-        <img src="{{ url_for_image }}" alt="Generated Image" id="generated-image">
     {% endif %}
   </div>
 </div>
