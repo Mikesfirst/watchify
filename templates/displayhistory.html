@@ -80,6 +80,7 @@
       <!-- Display the plot -->
       <img src="{{ url_for('static', filename='user_plot.png') }}" alt="Genre Audio Features" style="width: 100%; max-width: 600px; height: auto;">
     </div>
+    <p>{{ personalized_statement }}</p>
     <footer>
       <!-- Download link for the image -->
       <a href="{{ url_for('download_plot') }}" class="btn-custom">Download Your Journey</a>

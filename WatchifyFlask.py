@@ -246,8 +246,7 @@ def display_history():
     sp = spotipy.Spotify(auth=session['token'])
     
     # This function or variable definition should be before its usage.
-    top_5_genres = sorted(genre_count, key=genre_count.get, reverse=True)[:5]
-    print('TOP 5: ', top_5_genres)
+    top_5_genres = sp.current_user_top_artists(limit=5)['items']
 
     current_user = sp.current_user()
     # Initialize user_metrics
@@ -255,8 +254,20 @@ def display_history():
     #Getting the avergage metrics for the user
     user_metrics = {"valence": 0, "danceability": 0, "energy": 0}
     data = {'Genre': [], 'Valence': [], 'Danceability': [], 'Energy': [], 'Count': []}
-
+    
+    #Getting top artists genres
+    top_artists = sp.current_user_top_artists(limit=30, time_range="short_term")['items']
     count = 0
+    pre_data = {}
+
+    artist_count = 0
+    while len(pre_data) < 5 and artist_count < len(top_artists):
+        if len(top_artists[artist_count]['genres']) > 0 and top_artists[artist_count]['genres'][0] not in pre_data:
+            pre_data[top_artists[artist_count]['genres'][0]] = {'Valence': 0.0, 'Danceability': 0.0, 'Energy': 0.0, 'Count': 0}
+        artist_count += 1
+    
+         
+    print("DATA::::", pre_data)
     tracks = sp.current_user_top_tracks(time_range='short_term', limit=30)['items']
     for track in tracks:
         song_id = track['id']
@@ -266,13 +277,20 @@ def display_history():
             user_metrics["danceability"] += song_metrics['danceability']
             user_metrics["energy"] += song_metrics['energy']
             count += 1
+        if len(sp.artist(track['album']['artists'][0]['id'])['genres']) > 0:
+            artist_gen = sp.artist(track['album']['artists'][0]['id'])['genres'][0]
+            if artist_gen in pre_data:
+                pre_data[artist_gen]["Valence"] += song_metrics['valence']
+                pre_data[artist_gen]["Danceability"] += song_metrics['danceability']
+                pre_data[artist_gen]["Energy"] += song_metrics['energy']
+                pre_data[artist_gen]["Count"] += 1
     if count > 0:
         user_metrics["valence"] = user_metrics["valence"] / count
-        data['Valence'] = user_metrics["valence"]
+        #data['Valence'] = user_metrics["valence"]
         user_metrics["danceability"] = user_metrics["danceability"] / count
-        data['Danceability'] = user_metrics["danceability"] 
+       # data['Danceability'] = user_metrics["danceability"] 
         user_metrics["energy"] = user_metrics["energy"] / count
-        data["Energy"] = user_metrics["energy"]
+        #data["Energy"] = user_metrics["energy"]
 
 #Now finds which genre is closest to the users metrics 
     global genre_td
@@ -303,7 +321,6 @@ def display_history():
         genre_td[genre] = total_diff
 
         if total_diff <= best_diff:
-            print("total_diff: ", total_diff)
             best_genre = genre
             best_diff = total_diff    
             
@@ -315,17 +332,33 @@ def display_history():
             if genre not in Genre_choice:
                 Genre_choice.append(genre)
     
-#-------------------------------------------------------------------------------------
+    statement = generate_personalized_statement(user_metrics['valence'], user_metrics['danceability'], user_metrics['energy'])
+    print(statement)
+#----------------------Adding To The Data-----------------------------------------------
+    
+    keys_to_delete = [key for key in pre_data if pre_data[key]["Count"] == 0]
 
-    data['Genre'] = Genre_choice
+    for key in keys_to_delete:
+        del pre_data[key]
+
+    for x in pre_data:
+        for y in pre_data[x]:
+            if y != "Count":
+             pre_data[x][y] = pre_data[x][y]/ pre_data[x]['Count']
+
+    for x in pre_data:
+        data['Genre'].append(x)
+        for y in pre_data[x]:
+            if y != "Count":
+                data[y].append(pre_data[x][y])
     data['Count'] = count
+
 #--------------------MATPLOTTTTTTTTTT-----------------
     df = pd.DataFrame(data)
     melted_df = df.melt(id_vars=['Genre', 'Count'], value_vars=['Valence', 'Danceability', 'Energy'],
                     var_name='Feature', value_name='Average')
     try:
         # Plotting the graph
-        print("Hey queeeen!")
         plt.figure(figsize=(16, 9))
         sns.barplot(x='Genre', y='Average', hue='Feature', data=melted_df, palette=['#1db954', '#191414', '#ababab'])
 
@@ -353,7 +386,7 @@ def display_history():
         # Pass the image path to the template for display
     except:
         print("Error: DataFrame Empty!")
-    return render_template('displayhistory.html', img_path=img_path, username=current_user['display_name'], personalized_statement=generate_personalized_statement)
+    return render_template('displayhistory.html', img_path=img_path, username=current_user['display_name'], personalized_statement=statement)
 #--------------------MATPLOTTTTTTTTTT-----------------
 @app.route('/download_plot')
 def download_plot():
