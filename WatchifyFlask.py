@@ -26,23 +26,19 @@ recommended_tvshow = []
 recommended_movie = []
 
 # Spotify API Credentials
-# SPOTIPY_CLIENT_ID = '55118ada9eb54f9aa5633d24c6e5e0cf'
-# SPOTIPY_CLIENT_SECRET = '6fe22f2ca5864f6b88a9477de0df7a6f'
-# SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
+SPOTIPY_CLIENT_ID = '55118ada9eb54f9aa5633d24c6e5e0cf'
+SPOTIPY_CLIENT_SECRET = '6fe22f2ca5864f6b88a9477de0df7a6f'
+SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
 
 #Michael's ID just to run locally
-SPOTIPY_CLIENT_ID = "6f8bacd4931e41839442e43813d4fcfb"
-SPOTIPY_CLIENT_SECRET = "bd500cdc7b674c3087c2eadbdb0ec058" 
-SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
+# SPOTIPY_CLIENT_ID = "6f8bacd4931e41839442e43813d4fcfb"
+# SPOTIPY_CLIENT_SECRET = "bd500cdc7b674c3087c2eadbdb0ec058" 
+# SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
 
 sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
                         client_secret=SPOTIPY_CLIENT_SECRET,
                         redirect_uri=SPOTIPY_REDIRECT_URI,
                         scope=["user-top-read"])
-
-# DALL-E API endpoint and API Key (replace 'YOUR_API_KEY' with your actual API key)
-DALL_E_API_ENDPOINT = "https://api.openai.com/v1/images/generations"
-DALL_E_API_KEY = "YOUR_API_KEY"
 
 # DB Configuration
 #app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@YOUR_RDS_ENDPOINT:5432/watchify' # change
@@ -192,23 +188,6 @@ def same_genres(genre_choices, genre_csv):
                 return False
     return True
 
-def generate_dalle_image(prompt):
-    headers = {
-        "Authorization": f"Bearer {DALL_E_API_KEY}",
-        "Content-Type": "application/json"
-    }
-    data = {
-        "prompt": prompt,
-        "n": 1,
-        "size": "200x200"
-    }
-    response = requests.post(DALL_E_API_ENDPOINT, headers=headers, data=json.dumps(data))
-    if response.status_code == 200:
-        image_data = response.json()['data'][0]['image']
-        return image_data
-    else:
-        return None
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -224,7 +203,6 @@ def callback():
     if not code:
         # Handle the case where the code is missing
         return "Error: No code provided.", 400
-
     try:
         token_info = sp_oauth.get_access_token(code, check_cache=False)
         session['token'] = token_info['access_token']
@@ -232,11 +210,11 @@ def callback():
         # Log the exception for debugging
         print(f"Error retrieving access token: {e}")
         return "Error in token retrieval.", 500
-
+    
     # Initialize the Spotipy client with the access token
     global sp
     sp = spotipy.Spotify(auth=session['token'])
-    return redirect(url_for('display_history'))
+    return render_template('loading.html')
 
 @app.route('/history')
 def display_history():
@@ -357,31 +335,47 @@ def display_history():
     df = pd.DataFrame(data)
     melted_df = df.melt(id_vars=['Genre', 'Count'], value_vars=['Valence', 'Danceability', 'Energy'],
                     var_name='Feature', value_name='Average')
-    try:
-        # Plotting the graph
-        plt.figure(figsize=(16, 9))
-        sns.barplot(x='Genre', y='Average', hue='Feature', data=melted_df, palette=['#1db954', '#191414', '#ababab'])
+    
+    # Increase font size globally for the plot
+    plt.rcParams.update({'font.size': 18})  # Increase the base font size
 
-        # Customize the plot
-        plt.title('Spotify Top 5 Genres and Audio Features (Last 30 Days)', fontsize=16)
-        plt.ylabel('Average Feature Value', fontsize=12)
-        plt.xlabel('Genre', fontsize=12)
+    try:
+        # Plotting the graph with a larger figure size
+        plt.figure(figsize=(20, 12))  # Increased figure size
+        barplot = sns.barplot(x='Genre', y='Average', hue='Feature', data=melted_df, palette=['#1db954', '#191414', '#ababab'])
+
+        # Customize the plot with larger font sizes
+        plt.title('Top 3 Spotify Genres and Audio Features (Last 30 Days)', fontsize=20)  # Increased title font size
+        plt.ylabel('Average Feature Value', fontsize=18)  # Increased y-axis label font size
+        plt.xlabel('Genre', fontsize=18)  # Increased x-axis label font size
         plt.xticks(rotation=45)
-        plt.legend(title='Feature')
+        plt.legend(title='Feature', fontsize=18)  # Increased legend font size
+
+        # Remove y-axis labels on the left
+        plt.gca().tick_params(labelleft=False)
+
+        # Capitalize the first letter of each genre and annotate values
+        for p in barplot.patches:
+            plt.annotate(format(p.get_height(), '.2f'), 
+                     (p.get_x() + p.get_width() / 2., p.get_height()), 
+                     ha = 'center', va = 'center', 
+                     xytext = (0, 9), 
+                     textcoords = 'offset points')
+    
+        # Update the x-axis labels to capitalize genres and ensure they are unique
+        unique_genres = melted_df['Genre'].unique()
+        plt.xticks(range(len(unique_genres)), [label.capitalize() for label in unique_genres])
 
         # Save the plot as a PNG file in a BytesIO object
         img = BytesIO()
-
         plt.savefig(img, format='png', bbox_inches='tight')
         img.seek(0)  # Rewind the file
         plt.clf()  # Clear the figure to free memory
 
         # Save the plot to the 'static' directory
-        #img_filename = 'user_plot.png'
         img_path = os.path.join('static', 'user_plot.png')
-        #img_path = url_for('static', filename=os.path.join('movierecs', img_filename))  
         with open(img_path, 'wb') as f:
-           f.write(img.getvalue())
+            f.write(img.getvalue())
 
         # Pass the image path to the template for display
     except:
@@ -428,18 +422,6 @@ def recommendation():
             recommended_show = df_filtered.sample().iloc[0]
             return render_template('displayrecommendation.html', recommended_show=recommended_show, choice=choice)
     return render_template('displayrecommendation.html', choice=choice)
-def generate_image():
-    title = request.form.get('title')
-    year = request.form.get('year')
-    genre = request.form.get('genre')
-    rating = request.form.get('rating')
-    description = request.form.get('description')
-    prompt = f"{title}, released in {year}, is a {genre} with a rating of {rating}/10. {description}"
-    image_data = generate_dalle_image(prompt)
-    if image_data:
-        return render_template('displayrecommendation.html', image_data=image_data)
-    else:
-        return render_template('displayrecommendation.html')
     
 
 if __name__ == '__main__':

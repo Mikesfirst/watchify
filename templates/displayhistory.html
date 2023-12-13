@@ -29,6 +29,13 @@
       align-items: center;
       margin-top: 20px;
     }
+
+    .genre-image {
+      max-width: 800px;
+      height: 600px;
+      margin-bottom: 25px; /* Adjust the value as needed */
+    }
+
     footer {
       margin-top: 20px;
       padding-bottom: 40px;
@@ -78,7 +85,7 @@
   <main class="container">
     <div class="genre-image">
       <!-- Display the plot -->
-      <img src="{{ url_for('static', filename='user_plot.png') }}" alt="Genre Audio Features" style="width: 100%; max-width: 600px; height: auto;">
+      <img src="{{ url_for('static', filename='user_plot.png') }}" alt="Genre Audio Features" class="genre-image">
     </div>
     <p>{{ personalized_statement }}</p>
     <footer>
