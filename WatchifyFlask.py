@@ -331,7 +331,7 @@ def display_history():
                 data[y].append(pre_data[x][y])
     data['Count'] = count
 
-#--------------------MATPLOTTTTTTTTTT-----------------
+#--------------------MATPLOT-----------------
     df = pd.DataFrame(data)
     melted_df = df.melt(id_vars=['Genre', 'Count'], value_vars=['Valence', 'Danceability', 'Energy'],
                     var_name='Feature', value_name='Average')
@@ -381,7 +381,7 @@ def display_history():
     except:
         print("Error: DataFrame Empty!")
     return render_template('displayhistory.html', img_path=img_path, username=current_user['display_name'], personalized_statement=statement)
-#--------------------MATPLOTTTTTTTTTT-----------------
+#--------------------MATPLOT-----------------
 @app.route('/download_plot')
 def download_plot():
     # Provide a route to download the plot
