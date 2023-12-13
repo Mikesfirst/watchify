@@ -14,3 +14,6 @@ Data Sources:
 - Movies: https://www.kaggle.com/datasets/rajugc/imdb-movies-dataset-based-on-genre
 - TV Shows: https://www.kaggle.com/datasets/payamamanat/imbd-dataset/data
 - entertainment.csv (combined & cleaned data, find in repo)
+
+By:
+Casey Roosma, Marcela Soriano, Michael Dominguez
