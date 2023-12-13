@@ -1,0 +1,62 @@
+<!-- Page 4: Loading Page -->
+<!-- https://shamp00the-cat.github.io/movierecs/-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Meta Refresh for automatic redirection after 8 seconds -->
+    <meta http-equiv="refresh" content="8;url={{ url_for('display_history') }}">
+    <title>Loading...</title>
+    <script type="text/javascript">
+        // JavaScript for redirection after 8 seconds
+        setTimeout(function() {
+            window.location.href = "{{ url_for('display_history') }}";
+        }, 8000);
+    </script>
+    <style>
+        body {    
+            text-align: center;    
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        h2 {
+            text-align: center; /* Center content horizontally */
+            font-family: 'Montserrat', sans-serif; /* Spotify font */
+            color: black; /* Text color */
+            font-size: 16px; /* Text size */
+        }
+        .video-container video {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Spotify Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="video-container">
+                    <video autoplay loop muted>
+                        <!-- Update the src attribute as per Flask's url_for function -->
+                        <source src="{{ url_for('static', filename='loading.mp4') }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                    <h2>Loading, please wait...</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
