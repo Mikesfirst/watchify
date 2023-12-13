@@ -7,9 +7,9 @@ How to Use:
 - Navigate to Index Page: Start by opening index.html.
 - Proceed to Login: Click on 'Proceed to Login' and you'll be redirected to loginpage.html. Login securely with your Spotify credentials.
 - View Your Music History: After logging in, view your last 30 days of Spotify listening history on displayhistory.html.
+- Download Graphic: Optionally download the Top 3 Spotify Genres graphic and share with your friends.
 - Get Personalized Recommendations: Choose between movie or TV show recommendations and proceed to view them on displayrecommendation.html.
-- Download Graphics: Optionally download the recommendation graphic or animation directly from the recommendation page and share with your friends.
 
-Data Sources (Find Data Processing Details in Watchify.ipynb file):
+Data Sources:
 - Movies: https://www.kaggle.com/datasets/rajugc/imdb-movies-dataset-based-on-genre
 - TV Shows: https://www.kaggle.com/datasets/payamamanat/imbd-dataset/data
