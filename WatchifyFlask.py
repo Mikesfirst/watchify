@@ -29,6 +29,17 @@ genre_count = {}
 recommended_tvshow = []
 recommended_movie = []
 
+#CASEY db variables
+global_user_data = []
+global_db_choice = ""
+global_db_recommendation = ""
+global_user_id = ""
+global_user_name = ""
+global_time_stamp = ""
+global_genre_choice = ""
+global_top_genres = []
+table_name = ""
+
 # Spotify API Credentials
 SPOTIPY_CLIENT_ID = '55118ada9eb54f9aa5633d24c6e5e0cf'
 SPOTIPY_CLIENT_SECRET = '6fe22f2ca5864f6b88a9477de0df7a6f'
@@ -403,34 +414,47 @@ def display_history():
         #CASEY ADDING USER DATA TO DB
         # Get current user information
         current_user = sp.current_user()
-        table_name = 'users'
         genre_string = ', '.join(Genre_choice)
+
+        global global_user_id
+        global global_user_name
+        global global_time_stamp
+        global global_top_genres
+        global global_genre_choice
+
+        global_user_id = current_user['id']
+        global_user_name = current_user['display_name']
+        global_time_stamp = datetime.now().isoformat()
+        global_top_genres = capitalized_genres
+        global_genre_choice = genre_string
+    
+
         # CASEY ADDING USER DATA TO DB
-        user_data = {
-            'user_id': current_user['id'],
-            'user_name': current_user['display_name'],
-            'created_at': datetime.now().isoformat(),
-            'top_genres': capitalized_genres,
-            'genre_choice': genre_string
-        }
+        #user_data = {
+        #    'user_id': current_user['id'],
+        #    'user_name': current_user['display_name'],
+        #    'created_at': datetime.now().isoformat(),
+        #    'top_genres': capitalized_genres,
+         #   'genre_choice': genre_string
+        #}
     
      # Attempt to insert user data into the 'users' table
                # Attempt to insert user data into the 'users' table
-        try:
-            user_insert, user_error = supabase.table('users').insert([user_data]).execute()
-            if user_error:
-                print('User Data Insert Error:', user_error)
-            else:
-                print('User Data Inserted Successfully')
-        except Exception as e:
-            print(f"Error inserting user data: {e}")
+        #try:
+        #    user_insert, user_error = supabase.table('users').insert([user_data]).execute()
+        #    if user_error:
+        #        print('User Data Insert Error:', user_error)
+        #    else:
+        #        print('User Data Inserted Successfully')
+        #except Exception as e:
+        #    print(f"Error inserting user data: {e}")
 
-        data, error = supabase.table(table_name).select().execute()
+        #data, error = supabase.table(table_name).select().execute()
 
         # Print the query result or error
-        print(f"Table name: {table_name}")
-        print(f"Query Result: {data}")
-        print(f"Query Error: {error}")
+        #print(f"Table name: {table_name}")
+        #print(f"Query Result: {data}")
+        #print(f"Query Error: {error}")
 
         # Save the plot as a PNG file in a BytesIO object
         img = BytesIO()
@@ -459,6 +483,8 @@ def download_plot():
 def recommendation():
     choice = ""
     token = session.get('token')
+    global global_db_choice
+    global global_db_recommendation
     if not token:
         return redirect(url_for('login'))
 
@@ -479,6 +505,9 @@ def recommendation():
             recommended_movie = df_filtered.sample().iloc[0]
             print("Choice: ", choice)
             print("Recommended movie: ", recommended_movie['title'])
+            global_db_choice = choice
+            global_db_recommendation = recommended_movie['title']
+            insert_data()
             return render_template('displayrecommendation.html', recommended_movie=recommended_movie, choice=choice, genre_choice=Genre_choice[0])
         elif choice == "tvshow":
             if len(Genre_choice) > 1:
@@ -490,9 +519,40 @@ def recommendation():
             recommended_show = df_filtered.sample().iloc[0]
             print("Choice: ", choice)
             print("Recommended show: ", recommended_show['title'])
+            global_db_choice = choice
+            global_db_recommendation = recommended_show['title']
+            insert_data()
             return render_template('displayrecommendation.html', recommended_show=recommended_show, choice=choice)
     return render_template('displayrecommendation.html', choice=choice)
-    
+     
+
+def insert_data():
+    table_name = 'users'
+    global global_user_data
+    global_user_data.append({
+        'user_id': global_user_id,
+        'user_name': global_user_name,
+        'created_at': datetime.now().isoformat(),
+        'top_genres': global_top_genres,
+        'genre_choice': global_genre_choice,
+        'choice': global_db_choice,
+        'recommendation': global_db_recommendation 
+
+    })
+    print(global_user_data)
+    # Attempt to insert user data into the 'users' table
+    try:
+        user_insert, user_error = supabase.table('users').insert(global_user_data).execute()
+        if user_error:
+            print('User Data Insert Error:', user_error)
+        else:
+            print('User Data Inserted Successfully')
+    except Exception as e:
+        print(f"Error inserting user data: {e}")
+
+    # Add code to insert recommendation data if available
+
+    return "Data inserted successfully!"
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
