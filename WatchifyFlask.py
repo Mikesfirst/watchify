@@ -14,7 +14,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from io import BytesIO
 import os
+from supabase import create_client, Client
+from dotenv import load_dotenv
+from datetime import datetime
 
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = 'SECRET_KEY'
@@ -41,8 +45,17 @@ sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
                         scope=["user-top-read"])
 
 # DB Configuration
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://username:password@YOUR_RDS_ENDPOINT:5432/watchify' # change
-db = SQLAlchemy()
+#app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:compSci233!@db.rmtknalrainsrintcejp.supabase.co:5432/postgres" 
+#db = SQLAlchemy()
+#db.init_app(app)
+#with app.app_context():
+#    db.create_all()
+
+url: str = os.environ.get("SUPABASE_URL")
+key: str = os.environ.get("SUPABASE_KEY")
+supabase: Client = create_client(url, key)
+
+
 #class Recommendation(db.Model):
    # id = db.Column(db.Integer, primary_key=True)
    # spotify_genres = db.Column(db.String)
@@ -223,10 +236,39 @@ def display_history():
     
     sp = spotipy.Spotify(auth=session['token'])
     
+    #CASEY ADDING USER DATA TO DB
+  # Get current user information
+    current_user = sp.current_user()
+    table_name = 'users'
+    # CASEY ADDING USER DATA TO DB
+    user_data = {
+        'user_id': current_user['id'],
+        'user_name': current_user['display_name'],
+        'created_at': datetime.now().isoformat()
+    }
+    
+    # Attempt to insert user data into the 'users' table
+       # Attempt to insert user data into the 'users' table
+    try:
+        user_insert, user_error = supabase.table('users').insert([user_data]).execute()
+        if user_error:
+            print('User Data Insert Error:', user_error)
+        else:
+            print('User Data Inserted Successfully')
+    except Exception as e:
+        print(f"Error inserting user data: {e}")
+
+    data, error = supabase.table(table_name).select().execute()
+
+    # Print the query result or error
+    print(f"Table name: {table_name}")
+    print(f"Query Result: {data}")
+    print(f"Query Error: {error}")
+
     # This function or variable definition should be before its usage.
     top_5_genres = sp.current_user_top_artists(limit=5)['items']
 
-    current_user = sp.current_user()
+    #current_user = sp.current_user()
     # Initialize user_metrics
 #-------------------------- metrics    -----------------------------------------------------------
     #Getting the avergage metrics for the user
