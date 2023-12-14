@@ -235,35 +235,6 @@ def display_history():
         return redirect(url_for('login'))
     
     sp = spotipy.Spotify(auth=session['token'])
-    
-    #CASEY ADDING USER DATA TO DB
-  # Get current user information
-    current_user = sp.current_user()
-    table_name = 'users'
-    # CASEY ADDING USER DATA TO DB
-    user_data = {
-        'user_id': current_user['id'],
-        'user_name': current_user['display_name'],
-        'created_at': datetime.now().isoformat()
-    }
-    
-    # Attempt to insert user data into the 'users' table
-       # Attempt to insert user data into the 'users' table
-    try:
-        user_insert, user_error = supabase.table('users').insert([user_data]).execute()
-        if user_error:
-            print('User Data Insert Error:', user_error)
-        else:
-            print('User Data Inserted Successfully')
-    except Exception as e:
-        print(f"Error inserting user data: {e}")
-
-    data, error = supabase.table(table_name).select().execute()
-
-    # Print the query result or error
-    print(f"Table name: {table_name}")
-    print(f"Query Result: {data}")
-    print(f"Query Error: {error}")
 
     # This function or variable definition should be before its usage.
     top_5_genres = sp.current_user_top_artists(limit=5)['items']
@@ -287,7 +258,7 @@ def display_history():
         artist_count += 1
     
          
-    print("DATA::::", pre_data)
+   # print("DATA::::", pre_data)
     tracks = sp.current_user_top_tracks(time_range='short_term', limit=30)['items']
     for track in tracks:
         song_id = track['id']
@@ -312,6 +283,10 @@ def display_history():
         user_metrics["energy"] = user_metrics["energy"] / count
         #data["Energy"] = user_metrics["energy"]
 
+  
+    print("Valence: ", user_metrics["valence"])
+    print("Danceability: ", user_metrics["danceability"])
+    print("Energy: ", user_metrics["energy"])
 #Now finds which genre is closest to the users metrics 
     global genre_td
     genre_td = {
@@ -354,6 +329,7 @@ def display_history():
     
     statement = generate_personalized_statement(user_metrics['valence'], user_metrics['danceability'], user_metrics['energy'])
     print(statement)
+    print(Genre_choice)
 #----------------------Adding To The Data-----------------------------------------------
     
     keys_to_delete = [key for key in pre_data if pre_data[key]["Count"] == 0]
@@ -407,6 +383,49 @@ def display_history():
         # Update the x-axis labels to capitalize genres and ensure they are unique
         unique_genres = melted_df['Genre'].unique()
         plt.xticks(range(len(unique_genres)), [label.capitalize() for label in unique_genres])
+
+
+
+        
+        capitalized_genres = []
+
+        for genre in unique_genres:
+            print("unique genres:", genre)
+            capitalized_genre = genre.capitalize()
+            capitalized_genres.append(capitalized_genre)
+
+        # Print the contents of the capitalized_genres array
+        print("Capitalized genres:", capitalized_genres)
+
+        #CASEY ADDING USER DATA TO DB
+        # Get current user information
+        current_user = sp.current_user()
+        table_name = 'users'
+        # CASEY ADDING USER DATA TO DB
+        user_data = {
+            'user_id': current_user['id'],
+            'user_name': current_user['display_name'],
+            'created_at': datetime.now().isoformat(),
+            'top_genres': capitalized_genres
+        }
+    
+     # Attempt to insert user data into the 'users' table
+               # Attempt to insert user data into the 'users' table
+        try:
+            user_insert, user_error = supabase.table('users').insert([user_data]).execute()
+            if user_error:
+                print('User Data Insert Error:', user_error)
+            else:
+                print('User Data Inserted Successfully')
+        except Exception as e:
+            print(f"Error inserting user data: {e}")
+
+        data, error = supabase.table(table_name).select().execute()
+
+        # Print the query result or error
+        print(f"Table name: {table_name}")
+        print(f"Query Result: {data}")
+        print(f"Query Error: {error}")
 
         # Save the plot as a PNG file in a BytesIO object
         img = BytesIO()
