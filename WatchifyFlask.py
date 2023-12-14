@@ -330,6 +330,9 @@ def display_history():
     statement = generate_personalized_statement(user_metrics['valence'], user_metrics['danceability'], user_metrics['energy'])
     print(statement)
     print(Genre_choice)
+    genre_string = ', '.join(Genre_choice)
+
+    print(genre_string)
 #----------------------Adding To The Data-----------------------------------------------
     
     keys_to_delete = [key for key in pre_data if pre_data[key]["Count"] == 0]
@@ -396,17 +399,19 @@ def display_history():
 
         # Print the contents of the capitalized_genres array
         print("Capitalized genres:", capitalized_genres)
-
+        
         #CASEY ADDING USER DATA TO DB
         # Get current user information
         current_user = sp.current_user()
         table_name = 'users'
+        genre_string = ', '.join(Genre_choice)
         # CASEY ADDING USER DATA TO DB
         user_data = {
             'user_id': current_user['id'],
             'user_name': current_user['display_name'],
             'created_at': datetime.now().isoformat(),
-            'top_genres': capitalized_genres
+            'top_genres': capitalized_genres,
+            'genre_choice': genre_string
         }
     
      # Attempt to insert user data into the 'users' table
@@ -457,7 +462,7 @@ def recommendation():
     if not token:
         return redirect(url_for('login'))
 
-    #User picks which media they want and we find the reccomended movie
+    #User picks which media they want and we find the recommended movie
     if request.method == 'POST':
         choice = request.form.get('choice')
         df = pd.read_csv('entertainment.csv')
@@ -472,6 +477,8 @@ def recommendation():
             if len(df_filtered) == 0 or len(Genre_choice) == 1:
                 df_filtered = df[df['genres'].notna() & (df['media'] == "movie") & df['genres'].str.contains(Genre_choice[0])]
             recommended_movie = df_filtered.sample().iloc[0]
+            print("Choice: ", choice)
+            print("Recommended movie: ", recommended_movie['title'])
             return render_template('displayrecommendation.html', recommended_movie=recommended_movie, choice=choice, genre_choice=Genre_choice[0])
         elif choice == "tvshow":
             if len(Genre_choice) > 1:
@@ -481,6 +488,8 @@ def recommendation():
             if len(df_filtered) == 0 or len(Genre_choice) == 1:
                 df_filtered = df[df['genres'].notna() & (df['media'] == "tv") & df['genres'].str.contains(Genre_choice[0])]
             recommended_show = df_filtered.sample().iloc[0]
+            print("Choice: ", choice)
+            print("Recommended show: ", recommended_show['title'])
             return render_template('displayrecommendation.html', recommended_show=recommended_show, choice=choice)
     return render_template('displayrecommendation.html', choice=choice)
     
