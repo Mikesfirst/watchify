@@ -41,14 +41,18 @@ global_top_genres = []
 table_name = ""
 
 # Spotify API Credentials
-SPOTIPY_CLIENT_ID = '55118ada9eb54f9aa5633d24c6e5e0cf'
-SPOTIPY_CLIENT_SECRET = '6fe22f2ca5864f6b88a9477de0df7a6f'
-SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
+#SPOTIPY_CLIENT_ID = '55118ada9eb54f9aa5633d24c6e5e0cf'
+#SPOTIPY_CLIENT_SECRET = '6fe22f2ca5864f6b88a9477de0df7a6f'
+#SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
 
 #Michael's ID just to run locally
-# SPOTIPY_CLIENT_ID = "6f8bacd4931e41839442e43813d4fcfb"
-# SPOTIPY_CLIENT_SECRET = "bd500cdc7b674c3087c2eadbdb0ec058" 
-# SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
+##SPOTIPY_CLIENT_ID = "6f8bacd4931e41839442e43813d4fcfb"
+#SPOTIPY_CLIENT_SECRET = "bd500cdc7b674c3087c2eadbdb0ec058" 
+#SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
+
+SPOTIPY_CLIENT_ID = os.environ.get("SPOTIPY_CLIENT_ID")
+SPOTIPY_CLIENT_SECRET = os.environ.get("SPOTIPY_CLIENT_SECRET")
+SPOTIPY_REDIRECT_URI = os.environ.get("SPOTIPY_REDIRECT_URI")
 
 sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
                         client_secret=SPOTIPY_CLIENT_SECRET,
@@ -512,11 +516,83 @@ def insert_data():
     fetch_users()
     return "Data inserted successfully!"
 
+@app.route('/fetch_users')
 def fetch_users():
     # Select all rows from the 'users' table
-    response = supabase.table('users').select('*').execute()
-    data = response.json()['data']
-    print(data)
+    response = supabase.table('users').select('*', count='exact').eq('user_id', global_user_id).execute()
+    
+    #print(response)
+    data = response.data
+    count = response.count
+
+    #print(data)
+
+    response_list = []
+
+    for entry_num in range(count):
+        entry_data = data[entry_num]
+        
+        user_id = entry_data.get('user_id')
+        created_at = entry_data.get('created_at')
+        created_at_datetime = datetime.fromisoformat(created_at[:-6])  # Convert to datetime object
+        user_name = entry_data.get('user_name')
+        top_genres = entry_data.get('top_genres')
+        genre_choice = entry_data.get('genre_choice')
+        choice = entry_data.get('choice')
+        recommendation = entry_data.get('recommendation')
+
+        response_list.append({
+            'user_id': user_id,
+            'created_at': created_at_datetime,
+            'user_name': user_name,
+            'top_genres': top_genres,
+            'genre_choice': genre_choice,
+            'choice': choice,
+            'recommendation': recommendation,
+        })
+
+    # Plotting
+    dates = [entry['created_at'] for entry in response_list]
+    entry_count = list(range(1, count + 1))
+
+    plt.plot(dates, entry_count, marker='o')
+    plt.xlabel('Date')
+    plt.ylabel('Number of Entries')
+    plt.title('Number of Entries Over Time')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+
+    # Save the plot as a PNG file in a BytesIO object
+    img = BytesIO()
+    plt.savefig(img, format='png', bbox_inches='tight')
+    img.seek(0)  # Rewind the file
+    plt.clf()  # Clear the figure to free memory
+
+    # Save the plot to the 'static' directory
+    img_path = os.path.join('static', 'entries_over_time.png')
+    with open(img_path, 'wb') as f:
+        f.write(img.getvalue())
+
+    print("Response list array :", response_list)
+    print("Response type: ", type(response))
+    print("Data type: ", type(data))
+
+
+    # Pass the image path to the template for display
+    return render_template('fetch_users.html', img_path=img_path, username=global_user_name, response_list=response_list)
+
+@app.route('/download_entries_plot')
+def download_entries_plot():
+    # Provide a route to download the entries plot
+    img_path = os.path.join('static', 'entries_over_time.png')
+    return send_from_directory(directory='static', path='entries_over_time.png', as_attachment=True, download_name='EntriesOverTime.png')
+
+
+#def fetch_users():
+    # Select all rows from the 'users' table
+    #response = supabase.table('users').select('*').execute()
+    #data = response.json()
+    #print(data)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

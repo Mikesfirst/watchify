@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Watchify: Your Musical Journey</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Spotify Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Custom CSS -->
+    <style>
+      body,
+      h1,
+      h2,
+      li {
+        font-family: "Montserrat", sans-serif;
+      }
+      body {
+        text-align: center;
+        background: #fff;
+        color: #000;
+      }
+      main {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 20px;
+      }
+
+      .entries-image {
+        max-width: 800px;
+        height: 600px;
+        margin-bottom: 25px; /* Adjust the value as needed */
+      }
+
+      footer {
+        margin-top: 20px;
+        padding-bottom: 40px;
+      }
+
+      footer a,
+      .btn-custom {
+        background-color: #1db954;
+        color: white;
+        font-family: "Montserrat", sans-serif;
+        font-weight: bold;
+        text-decoration: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        width: fit-content;
+        margin: 0 auto;
+      }
+
+      .btn-custom {
+        border: none;
+        display: inline-block;
+        margin: 5px;
+        cursor: pointer;
+      }
+
+      footer a:focus,
+      .btn-custom:focus {
+        outline: none;
+      }
+
+      header h2 {
+        margin-top: 30px;
+      }
+
+      .paragraph {
+        margin-top: 50px;
+        font-size: 20px;
+        max-width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Your Musical Journey</h1>
+      <p>Current Spotify User: {{ username }}</p>
+    </header>
+    <main class="container">
+      <div class="entries-image">
+        <!-- Display the plot -->
+        <img
+          src="{{ url_for('static', filename='entries_over_time.png') }}"
+          alt="User Entries Over Time"
+          class="entries-image"
+        />
+      </div>
+      <footer>
+        <!-- Download link for the image -->
+        <a href="{{ url_for('download_entries_plot') }}" class="btn-custom"
+          >Download Entries Over Time</a
+        >
+        <!-- Add any other buttons or links you need -->
+      </footer>
+    </main>
+  </body>
+</html>
