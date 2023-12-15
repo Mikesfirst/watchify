@@ -17,6 +17,13 @@ import os
 from supabase import create_client, Client
 from dotenv import load_dotenv
 from datetime import datetime
+from collections import Counter
+import plotly.express as px
+from plotly.offline import plot
+import plotly.io as pio
+
+
+
 
 load_dotenv()
 
@@ -516,83 +523,66 @@ def insert_data():
     fetch_users()
     return "Data inserted successfully!"
 
+# Update fetch_users function
 @app.route('/fetch_users')
 def fetch_users():
     # Select all rows from the 'users' table
     response = supabase.table('users').select('*', count='exact').eq('user_id', global_user_id).execute()
     
-    #print(response)
     data = response.data
     count = response.count
-
-    #print(data)
 
     response_list = []
 
     for entry_num in range(count):
         entry_data = data[entry_num]
         
-        user_id = entry_data.get('user_id')
-        created_at = entry_data.get('created_at')
-        created_at_datetime = datetime.fromisoformat(created_at[:-6])  # Convert to datetime object
-        user_name = entry_data.get('user_name')
         top_genres = entry_data.get('top_genres')
         genre_choice = entry_data.get('genre_choice')
-        choice = entry_data.get('choice')
-        recommendation = entry_data.get('recommendation')
 
         response_list.append({
-            'user_id': user_id,
-            'created_at': created_at_datetime,
-            'user_name': user_name,
             'top_genres': top_genres,
             'genre_choice': genre_choice,
-            'choice': choice,
-            'recommendation': recommendation,
         })
 
-    # Plotting
-    dates = [entry['created_at'] for entry in response_list]
-    entry_count = list(range(1, count + 1))
+    # Calculate average top genres
+    avg_top_genres = Counter()
+    for genres in response_list:
+        avg_top_genres += Counter(genres['top_genres'])
+    avg_top_genres = dict(avg_top_genres)
 
-    plt.plot(dates, entry_count, marker='o')
-    plt.xlabel('Date')
-    plt.ylabel('Number of Entries')
-    plt.title('Number of Entries Over Time')
-    plt.xticks(rotation=45)
-    plt.tight_layout()
+    # Calculate the most recommended genre choice
+    most_recommended_genre = max(set(entry['genre_choice'] for entry in response_list), key=response_list.count)
 
-    # Save the plot as a PNG file in a BytesIO object
-    img = BytesIO()
-    plt.savefig(img, format='png', bbox_inches='tight')
-    img.seek(0)  # Rewind the file
-    plt.clf()  # Clear the figure to free memory
+    # Create a bar chart using Plotly
+    fig = px.bar(x=list(avg_top_genres.keys()), y=list(avg_top_genres.values()), labels={'y': 'Genre Count'}, title='Average Top Genres Over Time')
+    plot_div = plot(fig, output_type='div', include_plotlyjs=False)
 
-    # Save the plot to the 'static' directory
-    img_path = os.path.join('static', 'entries_over_time.png')
-    with open(img_path, 'wb') as f:
-        f.write(img.getvalue())
-
-    print("Response list array :", response_list)
-    print("Response type: ", type(response))
-    print("Data type: ", type(data))
+    # Pass the plot_div and other data to the template for display
+    return render_template('fetch_users.html', plot_div=plot_div, username=global_user_name,
+                           most_recommended_genre=most_recommended_genre)
 
 
-    # Pass the image path to the template for display
-    return render_template('fetch_users.html', img_path=img_path, username=global_user_name, response_list=response_list)
-
+# Update download_entries_plot function
 @app.route('/download_entries_plot')
 def download_entries_plot():
-    # Provide a route to download the entries plot
-    img_path = os.path.join('static', 'entries_over_time.png')
-    return send_from_directory(directory='static', path='entries_over_time.png', as_attachment=True, download_name='EntriesOverTime.png')
+    global response_list
+    # Save the plot as a PNG file
+    img_path = os.path.join('static', 'top_genres_over_time.png')
+    if not os.path.exists(img_path):
+        # Calculate average top genres only if the file does not exist
+        avg_top_genres = Counter()
+        for entry in response_list:
+            avg_top_genres += Counter(entry['top_genres'])
+        avg_top_genres = dict(avg_top_genres)
 
+        # Create a bar chart using Plotly
+        fig = px.bar(x=list(avg_top_genres.keys()), y=list(avg_top_genres.values()), labels={'y': 'Genre Count'}, title='Average Top Genres Over Time')
+        pio.write_image(fig, img_path)
 
-#def fetch_users():
-    # Select all rows from the 'users' table
-    #response = supabase.table('users').select('*').execute()
-    #data = response.json()
-    #print(data)
+    # Provide a route to download the Plotly chart
+    return send_from_directory(directory='static', path='top_genres_over_time.png', as_attachment=True, download_name='TopGenresOverTime.png')
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

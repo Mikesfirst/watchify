@@ -91,20 +91,21 @@
       <p>Current Spotify User: {{ username }}</p>
     </header>
     <main class="container">
-      <div class="entries-image">
-        <!-- Display the plot -->
-        <img
-          src="{{ url_for('static', filename='entries_over_time.png') }}"
-          alt="User Entries Over Time"
-          class="entries-image"
-        />
+      <div>
+        <!-- Display the Plotly chart -->
+        {{ plot_div | safe }}
       </div>
+      <img
+        class="entries-image"
+        src="{{ url_for('static', filename='top_genres_over_time.png') }}"
+        alt="Top Genres Over Time"
+      />
+      <p>Most Recommended Genre Choice: {{ most_recommended_genre }}</p>
       <footer>
         <!-- Download link for the image -->
         <a href="{{ url_for('download_entries_plot') }}" class="btn-custom"
           >Download Entries Over Time</a
         >
-        <!-- Add any other buttons or links you need -->
       </footer>
     </main>
   </body>
