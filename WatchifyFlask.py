@@ -55,13 +55,6 @@ sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
                         redirect_uri=SPOTIPY_REDIRECT_URI,
                         scope=["user-top-read"])
 
-# DB Configuration
-#app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:compSci233!@db.rmtknalrainsrintcejp.supabase.co:5432/postgres" 
-#db = SQLAlchemy()
-#db.init_app(app)
-#with app.app_context():
-#    db.create_all()
-
 url: str = os.environ.get("SUPABASE_URL")
 key: str = os.environ.get("SUPABASE_KEY")
 supabase: Client = create_client(url, key)
@@ -398,9 +391,6 @@ def display_history():
         unique_genres = melted_df['Genre'].unique()
         plt.xticks(range(len(unique_genres)), [label.capitalize() for label in unique_genres])
 
-
-
-        
         capitalized_genres = []
 
         for genre in unique_genres:
@@ -428,34 +418,6 @@ def display_history():
         global_top_genres = capitalized_genres
         global_genre_choice = genre_string
     
-
-        # CASEY ADDING USER DATA TO DB
-        #user_data = {
-        #    'user_id': current_user['id'],
-        #    'user_name': current_user['display_name'],
-        #    'created_at': datetime.now().isoformat(),
-        #    'top_genres': capitalized_genres,
-         #   'genre_choice': genre_string
-        #}
-    
-     # Attempt to insert user data into the 'users' table
-               # Attempt to insert user data into the 'users' table
-        #try:
-        #    user_insert, user_error = supabase.table('users').insert([user_data]).execute()
-        #    if user_error:
-        #        print('User Data Insert Error:', user_error)
-        #    else:
-        #        print('User Data Inserted Successfully')
-        #except Exception as e:
-        #    print(f"Error inserting user data: {e}")
-
-        #data, error = supabase.table(table_name).select().execute()
-
-        # Print the query result or error
-        #print(f"Table name: {table_name}")
-        #print(f"Query Result: {data}")
-        #print(f"Query Error: {error}")
-
         # Save the plot as a PNG file in a BytesIO object
         img = BytesIO()
         plt.savefig(img, format='png', bbox_inches='tight')
@@ -542,17 +504,19 @@ def insert_data():
     print(global_user_data)
     # Attempt to insert user data into the 'users' table
     try:
-        user_insert, user_error = supabase.table('users').insert(global_user_data).execute()
-        if user_error:
-            print('User Data Insert Error:', user_error)
-        else:
-            print('User Data Inserted Successfully')
+        supabase.table('users').insert(global_user_data).execute()
+        
     except Exception as e:
         print(f"Error inserting user data: {e}")
 
-    # Add code to insert recommendation data if available
-
+    fetch_users()
     return "Data inserted successfully!"
+
+def fetch_users():
+    # Select all rows from the 'users' table
+    response = supabase.table('users').select('*').execute()
+    data = response.json()['data']
+    print(data)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
