@@ -48,18 +48,18 @@ global_top_genres = []
 table_name = ""
 
 # Spotify API Credentials
-#SPOTIPY_CLIENT_ID = '55118ada9eb54f9aa5633d24c6e5e0cf'
-#SPOTIPY_CLIENT_SECRET = '6fe22f2ca5864f6b88a9477de0df7a6f'
-#SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
+SPOTIPY_CLIENT_ID = '55118ada9eb54f9aa5633d24c6e5e0cf'
+SPOTIPY_CLIENT_SECRET = '6fe22f2ca5864f6b88a9477de0df7a6f'
+SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
 
 #Michael's ID just to run locally
 ##SPOTIPY_CLIENT_ID = "6f8bacd4931e41839442e43813d4fcfb"
 #SPOTIPY_CLIENT_SECRET = "bd500cdc7b674c3087c2eadbdb0ec058" 
 #SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
 
-SPOTIPY_CLIENT_ID = os.environ.get("SPOTIPY_CLIENT_ID")
-SPOTIPY_CLIENT_SECRET = os.environ.get("SPOTIPY_CLIENT_SECRET")
-SPOTIPY_REDIRECT_URI = os.environ.get("SPOTIPY_REDIRECT_URI")
+# SPOTIPY_CLIENT_ID = os.environ.get("SPOTIPY_CLIENT_ID")
+# SPOTIPY_CLIENT_SECRET = os.environ.get("SPOTIPY_CLIENT_SECRET")
+# SPOTIPY_REDIRECT_URI = os.environ.get("SPOTIPY_REDIRECT_URI")
 
 sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
                         client_secret=SPOTIPY_CLIENT_SECRET,
@@ -100,15 +100,15 @@ def generate_personalized_statement(valence, danceability, energy):
     for lower, upper in valence_ranges:
         if lower <= valence <= upper:
             if valence < 0.20:
-                valence_statement = f"Your valence suggests you've been diving deep into the world of sad music. It's time for some virtual hugs!"
+                valence_statement = f"The positivity levels suggest you've been diving deep into the world of sad music. It's time for some virtual hugs!"
             elif valence < 0.40:
-                valence_statement = f"Your valence shows a touch of melancholy. Maybe you're composing the soundtrack of a rainy day?"
+                valence_statement = f"The positivity levels show a touch of melancholy. Maybe you're composing the soundtrack of a rainy day?"
             elif valence < 0.60:
                 valence_statement = f"Your music falls in the 'not too happy, not too sad' range. A well-balanced playlist for life's adventures!"
             elif valence < 0.80:
-                valence_statement = f"Your valence indicates a cheerful and positive music taste. Keep rocking those good vibes!"
+                valence_statement = f"The positivity levels indicate a cheerful and positive music taste. Keep rocking those good vibes!"
             else:
-                valence_statement = f"Wow, your valence is off the charts! You must be the life of the party with such happy music!"
+                valence_statement = f"Wow, your positivity levels are off the charts! You must be the life of the party with such happy music!"
 
     # Check Danceability
     for lower, upper in danceability_ranges:
@@ -139,7 +139,7 @@ def generate_personalized_statement(valence, danceability, energy):
                 energy_statement = f"Your music is high-energy and intense! It's like a musical energy drink!"
 
     # Combine the statements
-    personalized_statement = valence_statement + "\n" + danceability_statement + "\n" + energy_statement
+    personalized_statement = [valence_statement, danceability_statement, energy_statement]
 
     return personalized_statement
 
@@ -251,15 +251,10 @@ def display_history():
     
     sp = spotipy.Spotify(auth=session['token'])
 
-    # This function or variable definition should be before its usage.
-    top_5_genres = sp.current_user_top_artists(limit=5)['items']
-
-    #current_user = sp.current_user()
-    # Initialize user_metrics
 #-------------------------- metrics    -----------------------------------------------------------
     #Getting the avergage metrics for the user
     user_metrics = {"valence": 0, "danceability": 0, "energy": 0}
-    data = {'Genre': [], 'Valence': [], 'Danceability': [], 'Energy': [], 'Count': []}
+    data = {'Genre': [], 'Positivity': [], 'Danceability': [], 'Energy': [], 'Count': []}
     
     #Getting top artists genres
     top_artists = sp.current_user_top_artists(limit=30, time_range="short_term")['items']
@@ -269,39 +264,40 @@ def display_history():
     artist_count = 0
     while len(pre_data) < 5 and artist_count < len(top_artists):
         if len(top_artists[artist_count]['genres']) > 0 and top_artists[artist_count]['genres'][0] not in pre_data:
-            pre_data[top_artists[artist_count]['genres'][0]] = {'Valence': 0.0, 'Danceability': 0.0, 'Energy': 0.0, 'Count': 0}
+            pre_data[top_artists[artist_count]['genres'][0]] = {'Positivity': 0.0, 'Danceability': 0.0, 'Energy': 0.0, 'Count': 0}
         artist_count += 1
     
-         
-   # print("DATA::::", pre_data)
     tracks = sp.current_user_top_tracks(time_range='short_term', limit=30)['items']
-    for track in tracks:
-        song_id = track['id']
-        song_metrics = sp.audio_features(song_id)[0]
+    track_ids = [track['id'] for track in tracks]
+    artist_ids = [track['album']['artists'][0]['id'] for track in tracks]
+
+    audio_features = sp.audio_features(track_ids)
+    artists_data = sp.artists(artist_ids)
+
+    # Going through tracks and assigning it to metrcics
+    for i, track in enumerate(tracks):
+        song_metrics = audio_features[i]
+        
         if song_metrics is not None:
             user_metrics["valence"] += song_metrics['valence']
             user_metrics["danceability"] += song_metrics['danceability']
             user_metrics["energy"] += song_metrics['energy']
             count += 1
-        if len(sp.artist(track['album']['artists'][0]['id'])['genres']) > 0:
-            artist_gen = sp.artist(track['album']['artists'][0]['id'])['genres'][0]
+        
+        artist_genres = artists_data['artists'][i]['genres']
+        if len(artist_genres) > 0:
+            artist_gen = artist_genres[0]
             if artist_gen in pre_data:
-                pre_data[artist_gen]["Valence"] += song_metrics['valence']
+                pre_data[artist_gen]["Positivity"] += song_metrics['valence']
                 pre_data[artist_gen]["Danceability"] += song_metrics['danceability']
                 pre_data[artist_gen]["Energy"] += song_metrics['energy']
                 pre_data[artist_gen]["Count"] += 1
+
     if count > 0:
         user_metrics["valence"] = user_metrics["valence"] / count
-        #data['Valence'] = user_metrics["valence"]
         user_metrics["danceability"] = user_metrics["danceability"] / count
-       # data['Danceability'] = user_metrics["danceability"] 
         user_metrics["energy"] = user_metrics["energy"] / count
-        #data["Energy"] = user_metrics["energy"]
 
-  
-    print("Valence: ", user_metrics["valence"])
-    print("Danceability: ", user_metrics["danceability"])
-    print("Energy: ", user_metrics["energy"])
 #Now finds which genre is closest to the users metrics 
     global genre_td
     genre_td = {
@@ -343,11 +339,8 @@ def display_history():
                 Genre_choice.append(genre)
     
     statement = generate_personalized_statement(user_metrics['valence'], user_metrics['danceability'], user_metrics['energy'])
-    print(statement)
-    print(Genre_choice)
     genre_string = ', '.join(Genre_choice)
 
-    print(genre_string)
 #----------------------Adding To The Data-----------------------------------------------
     
     keys_to_delete = [key for key in pre_data if pre_data[key]["Count"] == 0]
@@ -369,7 +362,7 @@ def display_history():
 
 #--------------------MATPLOT-----------------
     df = pd.DataFrame(data)
-    melted_df = df.melt(id_vars=['Genre', 'Count'], value_vars=['Valence', 'Danceability', 'Energy'],
+    melted_df = df.melt(id_vars=['Genre', 'Count'], value_vars=['Positivity', 'Danceability', 'Energy'],
                     var_name='Feature', value_name='Average')
     
     # Increase font size globally for the plot
@@ -381,9 +374,9 @@ def display_history():
         barplot = sns.barplot(x='Genre', y='Average', hue='Feature', data=melted_df, palette=['#1db954', '#191414', '#ababab'])
 
         # Customize the plot with larger font sizes
-        plt.title('Top 3 Spotify Genres and Audio Features (Last 30 Days)', fontsize=20)  # Increased title font size
+        plt.title('Top Spotify Genres and Audio Features (Last 30 Days)', fontsize=20)  # Increased title font size
         plt.ylabel('Average Feature Value', fontsize=18)  # Increased y-axis label font size
-        plt.xlabel('Genre', fontsize=18)  # Increased x-axis label font size
+        plt.xlabel('Top Genres', fontsize=18)  # Increased x-axis label font size
         plt.xticks(rotation=45)
         plt.legend(title='Feature', fontsize=18)  # Increased legend font size
 
