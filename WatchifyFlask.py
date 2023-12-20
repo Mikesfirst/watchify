@@ -21,6 +21,9 @@ from collections import Counter
 import plotly.express as px
 from plotly.offline import plot
 import plotly.io as pio
+import plotly.offline as pyo
+import plotly.graph_objs as go
+import base64
 
 
 
@@ -553,7 +556,7 @@ def fetch_users():
     #fig = px.bar(x=list(avg_top_genres.keys()), y=list(avg_top_genres.values()), labels={'y': 'Genre Count'}, title='Average Top Genres Over Time')
     #fig = px.bar(df, x='Genre', y='Count', title='Genre Counts')
     fig = px.bar(x=list(avg_top_genres.keys()), y=list(avg_top_genres.values()), labels={'x': 'Genre', 'y': 'Count'}, title='Genre Counts')
-    plot_div = plot(fig, output_type='div', include_plotlyjs=False)
+    plot_div = plot(fig, output_type='div')
 
     #pass the plot_div and other data to the template for display
     return render_template('fetch_users.html', plot_div=plot_div, username=global_user_name,
