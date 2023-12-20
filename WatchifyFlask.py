@@ -516,10 +516,9 @@ def insert_data():
     fetch_users()
     return "Data inserted successfully!"
 
-# Update fetch_users function
 @app.route('/fetch_users')
 def fetch_users():
-    # Select all rows from the 'users' table
+    
     response = supabase.table('users').select('*', count='exact').eq('user_id', global_user_id).execute()
     
     data = response.data
@@ -538,25 +537,30 @@ def fetch_users():
             'genre_choice': genre_choice,
         })
 
-    # Calculate average top genres
+    # calculate avg top genres
     avg_top_genres = Counter()
     for genres in response_list:
         avg_top_genres += Counter(genres['top_genres'])
+
+    print("Avg top genres: ", avg_top_genres)
     avg_top_genres = dict(avg_top_genres)
+    print("Top Genres: ", top_genres)
+    print("Avg top genres: ", avg_top_genres)
 
-    # Calculate the most recommended genre choice
     most_recommended_genre = max(set(entry['genre_choice'] for entry in response_list), key=response_list.count)
-
-    # Create a bar chart using Plotly
-    fig = px.bar(x=list(avg_top_genres.keys()), y=list(avg_top_genres.values()), labels={'y': 'Genre Count'}, title='Average Top Genres Over Time')
+    print("Most rec genre: ", most_recommended_genre)
+    #create the chart
+    #fig = px.bar(x=list(avg_top_genres.keys()), y=list(avg_top_genres.values()), labels={'y': 'Genre Count'}, title='Average Top Genres Over Time')
+    #fig = px.bar(df, x='Genre', y='Count', title='Genre Counts')
+    fig = px.bar(x=list(avg_top_genres.keys()), y=list(avg_top_genres.values()), labels={'x': 'Genre', 'y': 'Count'}, title='Genre Counts')
     plot_div = plot(fig, output_type='div', include_plotlyjs=False)
 
-    # Pass the plot_div and other data to the template for display
+    #pass the plot_div and other data to the template for display
     return render_template('fetch_users.html', plot_div=plot_div, username=global_user_name,
                            most_recommended_genre=most_recommended_genre)
 
 
-# Update download_entries_plot function
+#update download_entries_plot function
 @app.route('/download_entries_plot')
 def download_entries_plot():
     global response_list
@@ -570,12 +574,22 @@ def download_entries_plot():
         avg_top_genres = dict(avg_top_genres)
 
         # Create a bar chart using Plotly
-        fig = px.bar(x=list(avg_top_genres.keys()), y=list(avg_top_genres.values()), labels={'y': 'Genre Count'}, title='Average Top Genres Over Time')
-        pio.write_image(fig, img_path)
+        fig = px.bar(x=list(avg_top_genres.keys()), y=list(avg_top_genres.values()), labels={'x': 'Genre', 'y': 'Count'}, title='Genre Counts')
+        fig.update_layout(title='Average Top Genres Over Time', xaxis_title='Genre', yaxis_title='Count')
+
+        # Save the figure
+        fig.write_image(img_path)
+
+    # Display the chart in the HTML template
+    plot_div = plot(fig, output_type='div', include_plotlyjs=False)
 
     # Provide a route to download the Plotly chart
-    return send_from_directory(directory='static', path='top_genres_over_time.png', as_attachment=True, download_name='TopGenresOverTime.png')
+    return render_template('download_entries_plot.html', plot_div=plot_div)
 
+# Add this route to handle the download of the chart
+@app.route('/download_entries_plot')
+def download_plot_image():
+    return send_from_directory(directory='static', path='top_genres_over_time.png', as_attachment=True, download_name='TopGenresOverTime.png')
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

@@ -78,7 +78,7 @@
 
       .paragraph {
         margin-top: 50px;
-        font-size: 20px;
+        font-size: 100px;
         max-width: 80%;
         margin-left: auto;
         margin-right: auto;
@@ -88,7 +88,7 @@
   <body>
     <header>
       <h1>Your Musical Journey</h1>
-      <p>Current Spotify User: {{ username }}</p>
+      <p class="db_info">Current Spotify User: {{ username }}</p>
     </header>
     <main class="container">
       <div>
@@ -100,11 +100,13 @@
         src="{{ url_for('static', filename='top_genres_over_time.png') }}"
         alt="Top Genres Over Time"
       />
-      <p>Most Recommended Genre Choice: {{ most_recommended_genre }}</p>
+      <p class="db_info">
+        Most Recommended Genre Choice: {{ most_recommended_genre }}
+      </p>
       <footer>
         <!-- Download link for the image -->
-        <a href="{{ url_for('download_entries_plot') }}" class="btn-custom"
-          >Download Entries Over Time</a
+        <a href="{{ url_for('download_plot_image') }}" class="btn-custom"
+          >Download Chart</a
         >
       </footer>
     </main>
