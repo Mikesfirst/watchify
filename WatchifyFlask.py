@@ -51,18 +51,18 @@ global_top_genres = []
 table_name = ""
 
 # Spotify API Credentials
-#SPOTIPY_CLIENT_ID = '55118ada9eb54f9aa5633d24c6e5e0cf'
-#SPOTIPY_CLIENT_SECRET = '6fe22f2ca5864f6b88a9477de0df7a6f'
-#SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
+SPOTIPY_CLIENT_ID = '55118ada9eb54f9aa5633d24c6e5e0cf'
+SPOTIPY_CLIENT_SECRET = '6fe22f2ca5864f6b88a9477de0df7a6f'
+SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
 
 #Michael's ID just to run locally
-##SPOTIPY_CLIENT_ID = "6f8bacd4931e41839442e43813d4fcfb"
-#SPOTIPY_CLIENT_SECRET = "bd500cdc7b674c3087c2eadbdb0ec058" 
-#SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
+# SPOTIPY_CLIENT_ID = "6f8bacd4931e41839442e43813d4fcfb"
+# SPOTIPY_CLIENT_SECRET = "bd500cdc7b674c3087c2eadbdb0ec058" 
+# SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
 
-SPOTIPY_CLIENT_ID = os.environ.get("SPOTIPY_CLIENT_ID")
-SPOTIPY_CLIENT_SECRET = os.environ.get("SPOTIPY_CLIENT_SECRET")
-SPOTIPY_REDIRECT_URI = os.environ.get("SPOTIPY_REDIRECT_URI")
+# SPOTIPY_CLIENT_ID = os.environ.get("SPOTIPY_CLIENT_ID")
+# SPOTIPY_CLIENT_SECRET = os.environ.get("SPOTIPY_CLIENT_SECRET")
+# SPOTIPY_REDIRECT_URI = os.environ.get("SPOTIPY_REDIRECT_URI")
 
 sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
                         client_secret=SPOTIPY_CLIENT_SECRET,
