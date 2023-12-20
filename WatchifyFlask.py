@@ -51,18 +51,18 @@ global_top_genres = []
 table_name = ""
 
 # Spotify API Credentials
-SPOTIPY_CLIENT_ID = '55118ada9eb54f9aa5633d24c6e5e0cf'
-SPOTIPY_CLIENT_SECRET = '6fe22f2ca5864f6b88a9477de0df7a6f'
-SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
+#SPOTIPY_CLIENT_ID = '55118ada9eb54f9aa5633d24c6e5e0cf'
+#SPOTIPY_CLIENT_SECRET = '6fe22f2ca5864f6b88a9477de0df7a6f'
+#SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
 
 #Michael's ID just to run locally
 ##SPOTIPY_CLIENT_ID = "6f8bacd4931e41839442e43813d4fcfb"
 #SPOTIPY_CLIENT_SECRET = "bd500cdc7b674c3087c2eadbdb0ec058" 
 #SPOTIPY_REDIRECT_URI = 'http://127.0.0.1:5000/callback'
 
-# SPOTIPY_CLIENT_ID = os.environ.get("SPOTIPY_CLIENT_ID")
-# SPOTIPY_CLIENT_SECRET = os.environ.get("SPOTIPY_CLIENT_SECRET")
-# SPOTIPY_REDIRECT_URI = os.environ.get("SPOTIPY_REDIRECT_URI")
+SPOTIPY_CLIENT_ID = os.environ.get("SPOTIPY_CLIENT_ID")
+SPOTIPY_CLIENT_SECRET = os.environ.get("SPOTIPY_CLIENT_SECRET")
+SPOTIPY_REDIRECT_URI = os.environ.get("SPOTIPY_REDIRECT_URI")
 
 sp_oauth = SpotifyOAuth(client_id=SPOTIPY_CLIENT_ID,
                         client_secret=SPOTIPY_CLIENT_SECRET,
@@ -567,29 +567,24 @@ def fetch_users():
 @app.route('/download_entries_plot')
 def download_entries_plot():
     global response_list
-    # Save the plot as a PNG file
+
     img_path = os.path.join('static', 'top_genres_over_time.png')
     if not os.path.exists(img_path):
-        # Calculate average top genres only if the file does not exist
+        #calculate average top genres only if the file does not exist
         avg_top_genres = Counter()
         for entry in response_list:
             avg_top_genres += Counter(entry['top_genres'])
         avg_top_genres = dict(avg_top_genres)
 
-        # Create a bar chart using Plotly
         fig = px.bar(x=list(avg_top_genres.keys()), y=list(avg_top_genres.values()), labels={'x': 'Genre', 'y': 'Count'}, title='Genre Counts')
         fig.update_layout(title='Average Top Genres Over Time', xaxis_title='Genre', yaxis_title='Count')
-
-        # Save the figure
         fig.write_image(img_path)
 
-    # Display the chart in the HTML template
     plot_div = plot(fig, output_type='div', include_plotlyjs=False)
 
-    # Provide a route to download the Plotly chart
     return render_template('download_entries_plot.html', plot_div=plot_div)
 
-# Add this route to handle the download of the chart
+
 @app.route('/download_entries_plot')
 def download_plot_image():
     return send_from_directory(directory='static', path='top_genres_over_time.png', as_attachment=True, download_name='TopGenresOverTime.png')
